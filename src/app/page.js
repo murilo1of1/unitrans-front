@@ -107,7 +107,7 @@ export default function HomePage() {
             }}
             onClick={() => router.push("/login")}
           >
-            <CiUser />
+            <CiLogin />
             Entrar
           </IconButton>
         </Flex>

@@ -6,61 +6,67 @@ import {
   Portal,
   Box,
   VStack,
-  Input
+  Input,
 } from "@chakra-ui/react";
 import { FormLabel } from "@chakra-ui/form-control";
 import axios from "@/utils/axios";
 import { useState } from "react";
-import { Toaster, toaster } from "@/components/ui/toaster"
+import { Toaster, toaster } from "@/components/ui/toaster";
 
 export default function DialogForgotPassword({ isOpen, onClose }) {
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState(1);
-  const [email, setEmail] = useState('');
-  const [token, setToken] = useState('');
-  const [newPassword, setNewPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [token, setToken] = useState("");
+  const [newPassword, setNewPassword] = useState("");
 
   const sendEmail = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.post('/users/forgot-password', { email });
+      const response = await axios.post("/users/forgot-password", { email });
       if (response.status === 200) {
         setStep(2);
       } else {
         toaster.create({
-        title: "Erro ao enviar o e-mail. Por favor, tente novamente.",
-        type: "error"
-      })
+          title: "Erro ao enviar o e-mail. Por favor, tente novamente.",
+          type: "error",
+        });
       }
     } catch (error) {
       console.error("Erro ao enviar o e-mail:", error);
       toaster.create({
         title: "Erro ao enviar o e-mail!",
-        type: "error"
+        type: "error",
       });
-    }finally {
+    } finally {
       setIsLoading(false);
-    } 
+    }
   };
 
   const resetPassword = async () => {
     try {
-      const response = await axios.post('/users/reset-password', { token, newPassword });
+      const response = await axios.post("/users/reset-password", {
+        token,
+        newPassword,
+      });
       if (response.status === 200) {
         toaster.create({
-        title: "Senha alterada com sucesso!",
-        type: "success"
-      });
+          title: "Senha alterada com sucesso!",
+          type: "success",
+        });
         onClose();
       } else {
         toaster.create({
-          title:'Erro ao alterar a senha. Verifique o código e tente novamente.',
-          type: "error"
+          title:
+            "Erro ao alterar a senha. Verifique o código e tente novamente.",
+          type: "error",
         });
       }
     } catch (error) {
       console.error("Erro ao redefinir a senha:", error);
-      alert('Ocorreu um erro ao redefinir a senha. Por favor, tente novamente.');
+      alert(
+        "Ocorreu um erro ao redefinir a senha. Por favor, tente novamente."
+      );
     }
   };
 
@@ -74,9 +80,11 @@ export default function DialogForgotPassword({ isOpen, onClose }) {
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner>
-          <Dialog.Content bg="#181824">
+          <Dialog.Content bg="#282738" w="700px">
             <Dialog.Header>
-              <Dialog.Title fontFamily="Montserrat">Esqueci minha senha</Dialog.Title>
+              <Dialog.Title fontFamily="Montserrat">
+                Esqueci minha senha
+              </Dialog.Title>
             </Dialog.Header>
             <Dialog.Body>
               <Box>
@@ -84,34 +92,40 @@ export default function DialogForgotPassword({ isOpen, onClose }) {
                   {step === 1 && (
                     <>
                       <FormLabel htmlFor="email"></FormLabel>
-                      <Input  
+                      <Input
                         fontFamily="Montserrat"
                         id="email"
                         placeholder="Digite seu e-mail"
                         value={email}
-                        onChange={e => setEmail(e.target.value)}
+                        onChange={(e) => setEmail(e.target.value)}
                       />
-                      <IconButton  
-                        background="#db5c6e" 
-                        w="100%" 
+                      <IconButton
+                        background="#fdb525"
+                        w="100%"
                         fontFamily="Montserrat"
-                        onClick={sendEmail} 
+                        fontWeight="bold"
+                        onClick={sendEmail}
                         color="white"
-                        _hover={{opacity: 0.9,
-                                 transform: "scale(1.01)",
-                                 transition: "0.3s",}}>
-                            Enviar código
+                        _hover={{
+                          opacity: 0.9,
+                          transform: "scale(1.01)",
+                          transition: "0.3s",
+                        }}
+                      >
+                        Enviar código
                       </IconButton>
                     </>
                   )}
                   {step === 2 && (
                     <>
-                      <FormLabel htmlFor="token">Código de recuperação</FormLabel>
+                      <FormLabel htmlFor="token">
+                        Código de recuperação
+                      </FormLabel>
                       <Input
                         id="token"
                         placeholder="Digite o código recebido"
                         value={token}
-                        onChange={e => setToken(e.target.value)}
+                        onChange={(e) => setToken(e.target.value)}
                       />
                       <FormLabel htmlFor="new-password">Nova senha</FormLabel>
                       <Input
@@ -119,17 +133,20 @@ export default function DialogForgotPassword({ isOpen, onClose }) {
                         type="password"
                         placeholder="Digite a nova senha"
                         value={newPassword}
-                        onChange={e => setNewPassword(e.target.value)}
+                        onChange={(e) => setNewPassword(e.target.value)}
                       />
-                      <Button 
-                        fontFamily="Montserrat" 
-                        color="white" 
-                        background="#db5c6e" 
-                        w="100%" 
+                      <Button
+                        fontFamily="Montserrat"
+                        color="white"
+                        background="#fdb525"
+                        w="100%"
                         onClick={resetPassword}
-                        _hover={{opacity: 0.9,
-                                 transform: "scale(1.01)",
-                                 transition: "0.3s",}}>
+                        _hover={{
+                          opacity: 0.9,
+                          transform: "scale(1.01)",
+                          transition: "0.3s",
+                        }}
+                      >
                         Redefinir senha
                       </Button>
                     </>
@@ -137,8 +154,7 @@ export default function DialogForgotPassword({ isOpen, onClose }) {
                 </VStack>
               </Box>
             </Dialog.Body>
-            <Dialog.Footer>
-            </Dialog.Footer>
+            <Dialog.Footer></Dialog.Footer>
             <Dialog.CloseTrigger asChild>
               <CloseButton size="sm" />
             </Dialog.CloseTrigger>
