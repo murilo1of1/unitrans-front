@@ -15,15 +15,17 @@ export default function LoginPc() {
       const response = await api.post(`/aluno/login`, { ...content });
       if (response.status == 200) {
         const token = response.data.response;
-        localStorage.setItem("token", response.data.response);
-        console.log("Token salvo:", localStorage.getItem("token"));
-        const decoded = jwtDecode(token);
-        const role = decoded.role;
+        localStorage.setItem("token", token);
+        console.log("Token de aluno salvo:", localStorage.getItem("token"));
+        
         toaster.create({
-          description: "Login realizado com sucesso! Redirecionando...",
+          description: "Login de aluno realizado com sucesso! Redirecionando...",
           type: "success",
         });
-        router.push("/");
+        
+        setTimeout(() => {
+          router.push("/user");
+        }, 1500);
         return;
       }
     } catch (error) {
@@ -34,24 +36,18 @@ export default function LoginPc() {
       const response = await api.post(`/empresa/login`, { ...content });
       if (response.status == 200) {
         const token = response.data.response;
-        localStorage.setItem("token", response.data.response);
-        console.log("Token salvo:", localStorage.getItem("token"));
-        const decoded = jwtDecode(token);
-        const role = decoded.role;
+        localStorage.setItem("token", token);
+        console.log("Token de empresa salvo:", localStorage.getItem("token"));
+        
         toaster.create({
-          description: "Login realizado com sucesso! Redirecionando...",
+          description: "Login de empresa realizado com sucesso! Redirecionando...",
           type: "success",
         });
-        if (role === "admin") {
-          router.push("/");
-        } else {
-          router.push("/");
-        }
-      } else {
-        toaster.create({
-          description: "Erro ao fazer login!",
-          type: "error",
-        });
+        
+        setTimeout(() => {
+          router.push("/admin");
+        }, 1500);
+        return;
       }
     } catch (error) {
       toaster.create({
@@ -85,10 +81,9 @@ export default function LoginPc() {
         justifyContent="center"
         alignItems="center"
         bg="#232234"
-        h="700px"
+        h="600px"
         borderRadius={20}
         boxShadow="0 10px 30px rgba(0,0,0,0.3)"
-        p={6}
       >
         <VStack align="center" spacing={4} w="100%">
           <Image

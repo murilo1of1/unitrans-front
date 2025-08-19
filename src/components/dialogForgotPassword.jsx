@@ -82,7 +82,7 @@ export default function DialogForgotPassword({ isOpen, onClose }) {
         <Dialog.Positioner>
           <Dialog.Content bg="#282738" w="700px">
             <Dialog.Header>
-              <Dialog.Title fontFamily="Montserrat">
+              <Dialog.Title fontFamily="Montserrat" color="white">
                 Esqueci minha senha
               </Dialog.Title>
             </Dialog.Header>
@@ -91,13 +91,15 @@ export default function DialogForgotPassword({ isOpen, onClose }) {
                 <VStack spacing={4}>
                   {step === 1 && (
                     <>
-                      <FormLabel htmlFor="email"></FormLabel>
+                      <FormLabel htmlFor="email" color="white" fontFamily="Montserrat"></FormLabel>
                       <Input
                         fontFamily="Montserrat"
                         id="email"
                         placeholder="Digite seu e-mail"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        color="white"
+                        _placeholder={{ color: "gray.400" }}
                       />
                       <IconButton
                         background="#fdb525"
@@ -118,22 +120,28 @@ export default function DialogForgotPassword({ isOpen, onClose }) {
                   )}
                   {step === 2 && (
                     <>
-                      <FormLabel htmlFor="token">
+                      <FormLabel htmlFor="token" color="white" fontFamily="Montserrat">
                         Código de recuperação
                       </FormLabel>
                       <Input
+                        fontFamily="Montserrat"
                         id="token"
                         placeholder="Digite o código recebido"
                         value={token}
                         onChange={(e) => setToken(e.target.value)}
+                        color="white"
+                        _placeholder={{ color: "gray.400" }}
                       />
-                      <FormLabel htmlFor="new-password">Nova senha</FormLabel>
+                      <FormLabel htmlFor="new-password" color="white" fontFamily="Montserrat">Nova senha</FormLabel>
                       <Input
+                        fontFamily="Montserrat"
                         id="new-password"
                         type="password"
                         placeholder="Digite a nova senha"
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
+                        color="white"
+                        _placeholder={{ color: "gray.400" }}
                       />
                       <Button
                         fontFamily="Montserrat"
@@ -156,7 +164,7 @@ export default function DialogForgotPassword({ isOpen, onClose }) {
             </Dialog.Body>
             <Dialog.Footer></Dialog.Footer>
             <Dialog.CloseTrigger asChild>
-              <CloseButton size="sm" />
+              <CloseButton size="sm" color="white" bg="transparent"/>
             </Dialog.CloseTrigger>
           </Dialog.Content>
         </Dialog.Positioner>

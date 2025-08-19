@@ -3,9 +3,7 @@ import {
   Input,
   Stack,
   IconButton,
-  Portal,
-  Select,
-  createListCollection,
+  HStack,
 } from "@chakra-ui/react";
 import { PasswordInput } from "@/components/ui/password-input";
 import { InputGroup } from "@/components/ui/input-group";
@@ -16,108 +14,230 @@ import { useRouter } from "next/navigation";
 import { withMask } from "use-mask-input";
 
 export default function RegisterInput({ mandarDadosdofilho }) {
-  const [Email, setEmail] = useState("");
-  const [Password, setPassword] = useState("");
-  const [Name, setName] = useState("");
-  const [Phone, setPhone] = useState("");
-  const [Username, setUsername] = useState("");
-  const [CPF, setCPF] = useState("");
-  const [Role, setRole] = useState("");
+  const [userType, setUserType] = useState("aluno"); 
 
-  const rolesCollection = createListCollection({
-    items: [
-      { label: "Entregador", value: "delivery" },
-      { label: "Usuário", value: "user" },
-    ],
-  });
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+  const [cpf, setCpf] = useState("");
+  const [senha, setSenha] = useState("");
 
-  const content = {
-    email: Email,
-    password: Password,
-    name: Name,
-    phone: Phone,
-    username: Username,
-    cpf: CPF,
-    role: Role,
+  const [nomeEmpresa, setNomeEmpresa] = useState("");
+  const [cnpj, setCnpj] = useState("");
+  const [emailEmpresa, setEmailEmpresa] = useState("");
+  const [senhaEmpresa, setSenhaEmpresa] = useState("");
+
+  const getContent = () => {
+    if (userType === "aluno") {
+      return {
+        nome,
+        email,
+        cpf: cpf.trim(), 
+        senha,
+      };
+    } else if (userType === "empresa") {
+      return {
+        nome: nomeEmpresa,
+        cnpj: cnpj.trim(), 
+        email: emailEmpresa,
+        senha: senhaEmpresa,
+      };
+    }
+    return {};
   };
   const router = useRouter();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const validateAlunoForm = () => {
+    if (!nome || !email || !cpf || !senha) {
+      toaster.create({
+        title: "Preencha todos os campos obrigatórios (Nome, Email, CPF e Senha)!",
+        type: "error",
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const validateEmpresaForm = () => {
+    if (!nomeEmpresa || !cnpj || !emailEmpresa || !senhaEmpresa) {
+      toaster.create({
+        title: "Preencha todos os campos obrigatórios (Nome, CNPJ, Email e Senha)!",
+        type: "error",
+      });
+      return false;
+    }
+    return true;
+  };
+
   const mandarDados = async () => {
     if (isSubmitting) return;
     setIsSubmitting(true);
-    if (!Password || !Email || !Name || !Phone || !Username || !CPF || !Role) {
-      toaster.create({
-        title: "Preencha todos os valores!",
-        type: "error",
-      });
+    
+    const isValid = userType === "aluno" ? validateAlunoForm() : validateEmpresaForm();
+    
+    if (!isValid) {
       setIsSubmitting(false);
       return;
     }
-    await mandarDadosdofilho(content);
+    
+    await mandarDadosdofilho(getContent(), userType);
     setIsSubmitting(false);
   };
 
   return (
     <Stack>
-      <Input
-        mt="4%"
-        borderColor="#f0f0f0"
-        fontFamily="Montserrat"
-        variant="outline"
-        placeholder="Digite seu nome completo"
-        onChange={(e) => setName(e.target.value)}
-      />
-      <Input
-        mt="1%"
-        borderColor="#f0f0f0"
-        fontFamily="Montserrat"
-        variant="outline"
-        placeholder="Digite seu apelido"
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <Input
-        mt="1%"
-        borderColor="#f0f0f0"
-        fontFamily="Montserrat"
-        variant="outline"
-        ref={withMask("(99) 99999-9999")}
-        placeholder="Digite seu telefone"
-        onChange={(e) => setPhone(e.target.value)}
-      />
-      <Input
-        mt="1%"
-        borderColor="#f0f0f0"
-        fontFamily="Montserrat"
-        placeholder="Digite seu CPF"
-        ref={withMask("999.999.999-99")}
-        onChange={(e) => setCPF(e.target.value)}
-      />
+      {userType === "aluno" && (
+        <>
+          <Input
+            mt="2%"
+            borderColor="#f0f0f0"
+            fontFamily="Montserrat"
+            variant="outline"
+            placeholder="Digite seu nome completo"
+            value={nome}
+            onChange={(e) => setNome(e.target.value)}
+            color="white"
+            _placeholder={{ color: "gray.400" }}
+          />
+          
+          <Input
+            mt="1%"
+            borderColor="#f0f0f0"
+            fontFamily="Montserrat"
+            variant="outline"
+            placeholder="Digite seu email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            color="white"
+            _placeholder={{ color: "gray.400" }}
+          />
+          
+          <Input
+            mt="1%"
+            borderColor="#f0f0f0"
+            fontFamily="Montserrat"
+            placeholder="Digite seu CPF"
+            ref={withMask("999.999.999-99")}
+            value={cpf}
+            onChange={(e) => setCpf(e.target.value)}
+            color="white"
+            _placeholder={{ color: "gray.400" }}
+          />
 
-      <Input
-        mt="1%"
-        borderColor="#f0f0f0"
-        fontFamily="Montserrat"
-        variant="outline"
-        placeholder="Digite seu email"
-        onChange={(e) => setEmail(e.target.value)}
-      />
+          <InputGroup mt="1%" w="100%">
+            <PasswordInput
+              fontFamily="Montserrat"
+              borderColor="#f0f0f0"
+              variant="outline"
+              placeholder="Digite sua senha"
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+              color="white"
+              _placeholder={{ color: "gray.400" }}
+            />
+          </InputGroup>
+        </>
+      )}
 
-      <InputGroup mt="1%" w="100%">
-        <PasswordInput
+      {userType === "empresa" && (
+        <>
+          <Input
+            mt="2%"
+            borderColor="#f0f0f0"
+            fontFamily="Montserrat"
+            variant="outline"
+            placeholder="Digite o nome da empresa"
+            value={nomeEmpresa}
+            onChange={(e) => setNomeEmpresa(e.target.value)}
+            color="white"
+            _placeholder={{ color: "gray.400" }}
+          />
+          
+          <Input
+            mt="1%"
+            borderColor="#f0f0f0"
+            fontFamily="Montserrat"
+            placeholder="Digite o CNPJ"
+            ref={withMask("99.999.999/9999-99")}
+            value={cnpj}
+            onChange={(e) => setCnpj(e.target.value)}
+            color="white"
+            _placeholder={{ color: "gray.400" }}
+          />
+          
+          <Input
+            mt="1%"
+            borderColor="#f0f0f0"
+            fontFamily="Montserrat"
+            variant="outline"
+            placeholder="Digite o email da empresa"
+            type="email"
+            value={emailEmpresa}
+            onChange={(e) => setEmailEmpresa(e.target.value)}
+            color="white"
+            _placeholder={{ color: "gray.400" }}
+          />
+
+          <InputGroup mt="1%" w="100%">
+            <PasswordInput
+              fontFamily="Montserrat"
+              borderColor="#f0f0f0"
+              variant="outline"
+              placeholder="Digite a senha"
+              value={senhaEmpresa}
+              onChange={(e) => setSenhaEmpresa(e.target.value)}
+              color="white"
+              _placeholder={{ color: "gray.400" }}
+            />
+          </InputGroup>
+        </>
+      )}
+
+      <HStack spacing={1} w="100%" mt="3%" mb="1%">
+        <IconButton
+          bg={userType === "aluno" ? "#fdb525" : "transparent"}
+          color={userType === "aluno" ? "white" : "#fdb525"}
+          border="2px solid #fdb525"
           fontFamily="Montserrat"
-          borderColor="#f0f0f0"
-          variant="outline"
-          placeholder="Digite sua senha"
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </InputGroup>
+          fontWeight="bold"
+          borderRadius={5}
+          flex="1"
+          onClick={() => setUserType("aluno")}
+          _hover={{
+            opacity: 0.9,
+            transform: "scale(1.01)",
+            transition: "0.3s",
+          }}
+        >
+          Aluno
+        </IconButton>
+        <IconButton
+          bg={userType === "empresa" ? "#fdb525" : "transparent"}
+          color={userType === "empresa" ? "white" : "#fdb525"}
+          border="2px solid #fdb525"
+          fontFamily="Montserrat"
+          fontWeight="bold"
+          borderRadius={5}
+          flex="1"
+          onClick={() => setUserType("empresa")}
+          _hover={{
+            opacity: 0.9,
+            transform: "scale(1.01)",
+            transition: "0.3s",
+          }}
+        >
+          Empresa
+        </IconButton>
+      </HStack>
+
       <IconButton
         bg="#fdb525"
         color="white"
         variant="subtle"
         borderRadius={5}
+        fontFamily="Montserrat"
         _hover={{
           opacity: 0.9,
           transform: "scale(1.01)",
@@ -135,8 +255,9 @@ export default function RegisterInput({ mandarDadosdofilho }) {
         isLoading={isSubmitting}
         disabled={isSubmitting}
       >
-        Confirmar
+        {userType === "aluno" ? "Cadastrar Aluno" : "Cadastrar Empresa"}
       </IconButton>
+
       <Toaster />
     </Stack>
   );
