@@ -74,55 +74,41 @@ export default function LoginPc() {
       alignItems="center"
       filter="contrast(95%)"
       bgImage={"url(/fundotelainicial.png)"}
-      bgSize="100% 115%"
+      bgSize="cover"
       bgPosition="center"
       bgRepeat="no-repeat"
     >
       <Box
-        w="55%"
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-      ></Box>
-
-      <Box
-        w="30%"
+        w="500px"
+        maxW="90%"
         display="flex"
         justifyContent="center"
         alignItems="center"
         bg="#232234"
-        mr="100px"
-        h="800px"
+        h="700px"
         borderRadius={20}
+        boxShadow="0 10px 30px rgba(0,0,0,0.3)"
+        p={6}
       >
-        <VStack align="left">
+        <VStack align="center" spacing={4} w="100%">
           <Image
             src="/logosolo.png"
             alt="logo"
             objectFit="contain"
-            boxSize="200px"
-            ml="80px"
-            mt="-30%"
-            mb="-5%"
-          ></Image>
+            boxSize="180px"
+            mb={-6}
+            mt={-8}
+          />
           <Heading
             fontFamily="Montserrat"
             color="white"
             textAlign="center"
             as="h1"
-            fontSize={40}
+            fontSize={28}
             fontWeight={600}
+            mb={-1}
           >
             Acesse sua conta
-            <span
-              style={{
-                fontFamily: "monospace",
-                fontSize: "1.2em",
-                color: "white",
-              }}
-            >
-              !
-            </span>
           </Heading>
           <LoginInput mandarDadosdofilho={receberDadosdoFilho} />
         </VStack>

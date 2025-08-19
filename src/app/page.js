@@ -8,7 +8,7 @@ import {
   Image,
 } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
-import { CiLocationOn, CiUser, CiCircleQuestion } from "react-icons/ci";
+import { CiLogin, CiUser, CiCircleQuestion } from "react-icons/ci";
 
 export default function HomePage() {
   const router = useRouter();
@@ -85,7 +85,7 @@ export default function HomePage() {
             }}
             onClick={() => router.push("/register")}
           >
-            <CiLocationOn />
+            <CiUser />
             Criar Conta
           </IconButton>
           <IconButton

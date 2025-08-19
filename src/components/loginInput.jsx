@@ -34,11 +34,12 @@ export default function LoginInput({ mandarDadosdofilho }) {
       <InputGroup
         mt="7%"
         startElement={<FaUser color="white" opacity={0.8} />}
-        w="100%"
+        w="380px"
       >
         <Input
           variant="outline"
           placeholder="Login"
+          fontFamily="Montserrat"
           _placeholder={{ color: "white" }}
           onChange={(e) => setEmail(e.target.value)}
           borderColor="white"
@@ -52,6 +53,7 @@ export default function LoginInput({ mandarDadosdofilho }) {
         <PasswordInput
           variant="outline"
           placeholder="Senha"
+          fontFamily="Montserrat"
           _placeholder={{ color: "white" }}
           onChange={(e) => setSenha(e.target.value)}
           borderColor="white"
@@ -61,6 +63,7 @@ export default function LoginInput({ mandarDadosdofilho }) {
         bg="#fdb525"
         color="white"
         variant="subtle"
+        fontFamily="Montserrat"
         onClick={mandarDados}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
@@ -83,6 +86,7 @@ export default function LoginInput({ mandarDadosdofilho }) {
         bg="#fdb525"
         color="white"
         variant="subtle"
+        fontFamily="Montserrat"
         borderRadius={5}
         _hover={{
           opacity: 0.9,
@@ -97,6 +101,7 @@ export default function LoginInput({ mandarDadosdofilho }) {
       <IconButton
         variant="plain"
         mt="1%"
+        fontFamily="Montserrat"
         color="#fdb525"
         _hover={{
           opacity: 0.9,
