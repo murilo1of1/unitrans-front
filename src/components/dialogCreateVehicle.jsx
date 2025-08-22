@@ -117,7 +117,7 @@ export default function DialogCreateVehicle({ isOpen, onClose, onCreated, editin
         <Dialog.Positioner>
           <Dialog.Content bg="#2c2b3c" color="#fff" borderRadius="lg" maxW="500px">
             <Dialog.Header>
-              <Dialog.Title fontFamily="Montserrat" color="#fdb525" fontSize="xl" fontWeight="bold">
+              <Dialog.Title fontFamily="Montserrat" color="white" fontSize="xl" fontWeight="bold">
                 {editingVehicle ? "Editar Veículo" : "Adicionar Veículo"}
               </Dialog.Title>
             </Dialog.Header>
@@ -125,7 +125,7 @@ export default function DialogCreateVehicle({ isOpen, onClose, onCreated, editin
               <Box>
                 <VStack spacing={4} align="stretch">
                   <Box>
-                    <FormLabel fontFamily="Montserrat" color="#fdb525" fontWeight="500" mb={2}>
+                    <FormLabel fontFamily="Montserrat" color="white" fontWeight="500" mb={2}>
                       Modelo do Veículo
                     </FormLabel>
                     <Input
@@ -141,7 +141,7 @@ export default function DialogCreateVehicle({ isOpen, onClose, onCreated, editin
                   </Box>
 
                   <Box>
-                    <FormLabel fontFamily="Montserrat" color="#fdb525" fontWeight="500" mb={2}>
+                    <FormLabel fontFamily="Montserrat" color="white" fontWeight="500" mb={2}>
                       Placa
                     </FormLabel>
                     <Input
@@ -157,7 +157,7 @@ export default function DialogCreateVehicle({ isOpen, onClose, onCreated, editin
                   </Box>
 
                   <Box>
-                    <FormLabel fontFamily="Montserrat" color="#fdb525" fontWeight="500" mb={2}>
+                    <FormLabel fontFamily="Montserrat" color="white" fontWeight="500" mb={2}>
                       Descrição
                     </FormLabel>
                     <Input
@@ -173,7 +173,7 @@ export default function DialogCreateVehicle({ isOpen, onClose, onCreated, editin
                   </Box>
 
                   <Box>
-                    <FormLabel fontFamily="Montserrat" color="#fdb525" fontWeight="500" mb={2}>
+                    <FormLabel fontFamily="Montserrat" color="white" fontWeight="500" mb={2}>
                       Capacidade (passageiros)
                     </FormLabel>
                     <Input
@@ -189,7 +189,7 @@ export default function DialogCreateVehicle({ isOpen, onClose, onCreated, editin
                   </Box>
 
                   <Box>
-                    <FormLabel fontFamily="Montserrat" color="#fdb525" fontWeight="500" mb={2}>
+                    <FormLabel fontFamily="Montserrat" color="white" fontWeight="500" mb={2}>
                       Imagem do Veículo
                     </FormLabel>
                     <FileUpload.Root
@@ -262,7 +262,7 @@ export default function DialogCreateVehicle({ isOpen, onClose, onCreated, editin
             <Dialog.CloseTrigger asChild>
               <CloseButton 
                 size="sm" 
-                color="#fdb525"
+                color="white"
                 _hover={{ bg: "#3a3947" }}
               />
             </Dialog.CloseTrigger>
