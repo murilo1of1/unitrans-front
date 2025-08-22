@@ -9,6 +9,7 @@ import {
   HStack,
 } from "@chakra-ui/react";
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
+import { FaMapMarkedAlt } from "react-icons/fa";
 
 import { Toaster, toaster } from "@/components/ui/toaster";
 
@@ -108,7 +109,7 @@ const TabelaVeiculos = ({ vehicles, loading }) => {
                 color="#64748B"
                 borderBottom="1px solid #E2E8F0"
               >
-                Ano
+                Descrição
               </Table.ColumnHeader>
               <Table.ColumnHeader
                 fontFamily="Montserrat"
@@ -167,7 +168,7 @@ const TabelaVeiculos = ({ vehicles, loading }) => {
                   py={4}
                   borderBottom="1px solid #E2E8F0"
                 >
-                  {vehicle.modelo || vehicle.descricao || "N/A"}
+                  {vehicle.modelo || "N/A"}
                 </Table.Cell>
                 <Table.Cell
                   fontFamily="Montserrat"
@@ -185,7 +186,7 @@ const TabelaVeiculos = ({ vehicles, loading }) => {
                   color="#334155"
                   borderBottom="1px solid #E2E8F0"
                 >
-                  {vehicle.ano || "N/A"}
+                  {vehicle.descricao || "N/A"}
                 </Table.Cell>
                 <Table.Cell
                   fontFamily="Montserrat"
@@ -248,6 +249,15 @@ const TabelaVeiculos = ({ vehicles, loading }) => {
                       p={2}
                     >
                       <FiTrash2 size={16} />
+                    </Button>
+                    <Button
+                      size="sm"
+                      bg="transparent"
+                      color="#64748B"
+                      _hover={{ color: "#18c418ff", bg: "#f2fef4ff" }}
+                      p={2}
+                    >
+                      <FaMapMarkedAlt size={16} />
                     </Button>
                   </HStack>
                 </Table.Cell>
