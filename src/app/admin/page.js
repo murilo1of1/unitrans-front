@@ -4,12 +4,16 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/utils/axios";
 import TabelaVeiculos from "@/components/tableVehiclesNew";
+import InputPesquisa from "@/components/inputPesquisa";
+import DialogCreateVehicle from "@/components/dialogCreateVehicle";
 
 export default function Admin() {
   const [vehicles, setVehicles] = useState([]);
   const [empresa, setEmpresa] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
   const [activeSection, setActiveSection] = useState("veiculos");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const router = useRouter();
 
   const decodeToken = (token) => {
@@ -40,10 +44,94 @@ export default function Admin() {
     setActiveSection(section);
   };
 
+  const handleVehicleCreated = () => {
+    const token = localStorage.getItem("token");
+    const decodedToken = decodeToken(token);
+    
+    if (decodedToken && decodedToken.idEmpresa) {
+      fetchVehicles(decodedToken.idEmpresa, token);
+    }
+  };
+
+  const fetchVehicles = async (idEmpresa, token) => {
+    setLoading(true);
+    try {
+      const response = await api.get(
+        `/empresa/${idEmpresa}/veiculos`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data && response.data.data) {
+        setVehicles(
+          Array.isArray(response.data.data) ? response.data.data : []
+        );
+      } else {
+        setVehicles([]);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar veículos:", error);
+      if (error.response?.status === 401) {
+        localStorage.removeItem("token");
+        router.push("/login");
+      }
+      setVehicles([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+    const filteredVehicles = vehicles.filter(
+    (item) =>
+      item.descricao?.toLowerCase().includes(search.toLowerCase()) ||
+      item.modelo?.toLowerCase().includes(search.toLowerCase()) ||
+      item.placa?.toLowerCase().includes(search.toLowerCase())
+  );
+
   const renderContent = () => {
     switch (activeSection) {
       case "veiculos":
-        return <TabelaVeiculos vehicles={vehicles} loading={loading} />;
+        return (
+          <Box>
+            <Flex justifyContent="space-between" alignItems="center" mb={2}>
+              <Text
+                fontSize="2xl"
+                fontWeight="bold"
+                color="#334155"
+                fontFamily="Montserrat"
+              >
+                Lista de Veículos
+              </Text>
+            </Flex>
+            <Flex
+              display="flex"
+              alignItems="center"
+              justifyContent="space-between"
+              mb={2}
+            >
+              <InputPesquisa
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Pesquisar veículo..."
+              />
+              <Button
+                bg="#fdb525"
+                color="white"
+                fontFamily="Montserrat"
+                fontWeight="bold"
+                ml={2}
+                _hover={{ bg: "#f59e0b", transform: "scale(1.02)", transition: "0.3s" }}
+                onClick={() => setIsDialogOpen(true)}
+              >
+                + Adicionar Veículo
+              </Button>
+            </Flex>
+            <TabelaVeiculos vehicles={filteredVehicles} loading={loading} />
+          </Box>
+        );
       case "alunos":
         return (
           <Box textAlign="center" mt={8}>
@@ -83,38 +171,7 @@ export default function Admin() {
 
     setEmpresa(decodedToken);
 
-    const fetchVehicles = async () => {
-      setLoading(true);
-      try {
-        const response = await api.get(
-          `/empresa/${decodedToken.idEmpresa}/veiculos`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (response.data && response.data.data) {
-          setVehicles(
-            Array.isArray(response.data.data) ? response.data.data : []
-          );
-        } else {
-          setVehicles([]);
-        }
-      } catch (error) {
-        console.error("Erro ao buscar veículos:", error);
-        if (error.response?.status === 401) {
-          localStorage.removeItem("token");
-          router.push("/login");
-        }
-        setVehicles([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchVehicles();
+    fetchVehicles(decodedToken.idEmpresa, token);
   }, [router]);
 
   return (
@@ -246,6 +303,13 @@ export default function Admin() {
           {renderContent()}
         </Box>
       </Flex>
+
+      <DialogCreateVehicle
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        onCreated={handleVehicleCreated}
+        idEmpresa={empresa?.idEmpresa}
+      />
     </Box>
   );
 }

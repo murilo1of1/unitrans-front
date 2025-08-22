@@ -34,32 +34,6 @@ const TabelaVeiculos = ({ vehicles, loading }) => {
 
   return (
     <>
-      <Flex justifyContent="space-between" alignItems="center" mb={6}>
-        <Text
-          fontSize="2xl"
-          fontWeight="bold"
-          color="#334155"
-          fontFamily="Montserrat"
-        >
-          Lista de Veículos
-        </Text>
-        <Button
-          bg="#fdb525"
-          color="white"
-          fontFamily="Montserrat"
-          fontWeight="bold"
-          borderRadius="md"
-          px={6}
-          py={2}
-          _hover={{
-            transform: "scale(1.02)",
-            transition: "0.3s",
-          }}
-        >
-          + Adicionar Veículo
-        </Button>
-      </Flex>
-
       <Box
         w="100%"
         bg="white"
@@ -71,12 +45,19 @@ const TabelaVeiculos = ({ vehicles, loading }) => {
           <Table.Header bg="#F8FAFC">
             <Table.Row>
               <Table.ColumnHeader
+                fontWeight="600"
+                fontSize="sm"
+                color="#64748B"
+                borderBottom="1px solid #E2E8F0"
+              >
+
+              </Table.ColumnHeader>
+              <Table.ColumnHeader
                 fontFamily="Montserrat"
                 textAlign="center"
                 fontWeight="600"
                 fontSize="sm"
                 color="#64748B"
-                py={4}
                 borderBottom="1px solid #E2E8F0"
               >
                 ID
@@ -129,16 +110,6 @@ const TabelaVeiculos = ({ vehicles, loading }) => {
                 color="#64748B"
                 borderBottom="1px solid #E2E8F0"
               >
-                Status
-              </Table.ColumnHeader>
-              <Table.ColumnHeader
-                fontFamily="Montserrat"
-                textAlign="center"
-                fontWeight="600"
-                fontSize="sm"
-                color="#64748B"
-                borderBottom="1px solid #E2E8F0"
-              >
                 Ações
               </Table.ColumnHeader>
             </Table.Row>
@@ -150,12 +121,16 @@ const TabelaVeiculos = ({ vehicles, loading }) => {
                 bg={index % 2 === 0 ? "white" : "#F8FAFC"}
                 _hover={{ bg: "#F1F5F9" }}
               >
+                <Table.Cell justifyContent="center" display="flex" alignItems="center">
+                  {vehicle.imagem && (
+                    <img src={vehicle.imagem} style={{ width: 130, height: 80, objectFit: "cover", borderRadius: 12 }} />
+                  )}
+                </Table.Cell>
                 <Table.Cell
                   fontFamily="Montserrat"
                   textAlign="center"
                   fontSize="sm"
                   color="#334155"
-                  py={4}
                   borderBottom="1px solid #E2E8F0"
                 >
                   {vehicle.id}
@@ -165,7 +140,6 @@ const TabelaVeiculos = ({ vehicles, loading }) => {
                   textAlign="left"
                   fontSize="sm"
                   color="#334155"
-                  py={4}
                   borderBottom="1px solid #E2E8F0"
                 >
                   {vehicle.modelo || "N/A"}
@@ -196,35 +170,6 @@ const TabelaVeiculos = ({ vehicles, loading }) => {
                   borderBottom="1px solid #E2E8F0"
                 >
                   {vehicle.capacidade || "N/A"}
-                </Table.Cell>
-                <Table.Cell textAlign="center" borderBottom="1px solid #E2E8F0">
-                  <Box
-                    borderRadius="full"
-                    bg={
-                      vehicle.ativo === true
-                        ? "#DCFCE7"
-                        : vehicle.ativo === false
-                        ? "#FEE2E2"
-                        : "#FEF3C7"
-                    }
-                    color={
-                      vehicle.ativo === true
-                        ? "#166534"
-                        : vehicle.ativo === false
-                        ? "#991B1B"
-                        : "#92400E"
-                    }
-                    fontWeight="500"
-                    fontSize="xs"
-                    fontFamily="Montserrat"
-                    display="inline-block"
-                  >
-                    {vehicle.ativo === true
-                      ? "Ativo"
-                      : vehicle.ativo === false
-                      ? "Inativo"
-                      : "Manutenção"}
-                  </Box>
                 </Table.Cell>
                 <Table.Cell
                   textAlign="center"

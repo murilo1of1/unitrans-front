@@ -2,13 +2,13 @@ import { Input, InputGroup } from "@chakra-ui/react";
 
 export default function InputPesquisa({ value, onChange, placeholder }) {
   return (
-    <InputGroup mb={-2} mt={1}>
+    <InputGroup>
       <Input
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        bg="#181824"
-        color="#fff"
+        bg="#f8fafc"
+        color="#828ea2"
         border="1px #white"
         fontFamily="Montserrat"
         fontSize="md"
