@@ -10,33 +10,39 @@ import {
   InputGroup,
 } from "@chakra-ui/react";
 import { FormLabel } from "@chakra-ui/form-control";
-import { Toaster, toaster } from "@/components/ui/toaster"
+import { Toaster, toaster } from "@/components/ui/toaster";
 import { FileUpload } from "@chakra-ui/react";
 import { LuUpload } from "react-icons/lu";
 import api from "@/utils/axios";
 import { useState, useEffect } from "react";
 
-export default function DialogCreateVehicle({ isOpen, onClose, onCreated, editingVehicle, idEmpresa }) {
-  const [modelo, setModelo] = useState('');
-  const [placa, setPlaca] = useState('');
-  const [descricao, setDescricao] = useState('');
-  const [capacidade, setCapacidade] = useState('');
-  const [imagem, setImagem] = useState('');
+export default function DialogCreateVehicle({
+  isOpen,
+  onClose,
+  onCreated,
+  editingVehicle,
+  idEmpresa,
+}) {
+  const [modelo, setModelo] = useState("");
+  const [placa, setPlaca] = useState("");
+  const [descricao, setDescricao] = useState("");
+  const [capacidade, setCapacidade] = useState("");
+  const [imagem, setImagem] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (isOpen && editingVehicle) {
-      setModelo(editingVehicle.modelo || '');
-      setPlaca(editingVehicle.placa || '');
-      setDescricao(editingVehicle.descricao || '');
-      setCapacidade(editingVehicle.capacidade || '');
-      setImagem(editingVehicle.imagem || '');
+      setModelo(editingVehicle.modelo || "");
+      setPlaca(editingVehicle.placa || "");
+      setDescricao(editingVehicle.descricao || "");
+      setCapacidade(editingVehicle.capacidade || "");
+      setImagem(""); // Deixa imagem vazia para substituir a antiga
     } else if (isOpen && !editingVehicle) {
-      setModelo('');
-      setPlaca('');
-      setDescricao('');
-      setCapacidade('');
-      setImagem('');
+      setModelo("");
+      setPlaca("");
+      setDescricao("");
+      setCapacidade("");
+      setImagem("");
     }
     setIsLoading(false);
   }, [isOpen, editingVehicle]);
@@ -60,7 +66,7 @@ export default function DialogCreateVehicle({ isOpen, onClose, onCreated, editin
       formData.append("descricao", descricao);
       formData.append("capacidade", capacidade);
       formData.append("idEmpresa", idEmpresa);
-      
+
       if (imagem instanceof File) {
         formData.append("imagem", imagem);
       }
@@ -68,36 +74,42 @@ export default function DialogCreateVehicle({ isOpen, onClose, onCreated, editin
       let response;
       if (editingVehicle) {
         response = await api.patch(`/veiculo/${editingVehicle.id}`, formData, {
-          headers: { 
+          headers: {
             "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
       } else {
-        response = await api.post('/veiculo', formData, {
-          headers: { 
+        response = await api.post("/veiculo", formData, {
+          headers: {
             "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
       }
 
       if (response.status === 200 || response.status === 201) {
         toaster.create({
-          title: editingVehicle ? "Veículo atualizado com sucesso!" : "Veículo criado com sucesso!",
+          title: editingVehicle
+            ? "Veículo atualizado com sucesso!"
+            : "Veículo criado com sucesso!",
           type: "success",
         });
         if (onCreated) onCreated();
         onClose();
       } else {
         toaster.create({
-          title: editingVehicle ? "Erro ao atualizar veículo." : "Erro ao criar veículo.",
+          title: editingVehicle
+            ? "Erro ao atualizar veículo."
+            : "Erro ao criar veículo.",
           type: "error",
         });
-      } 
+      }
     } catch (error) {
       toaster.create({
-        title: editingVehicle ? "Erro ao atualizar veículo." : "Erro ao criar veículo.",
+        title: editingVehicle
+          ? "Erro ao atualizar veículo."
+          : "Erro ao criar veículo.",
         status: "error",
       });
     } finally {
@@ -113,11 +125,21 @@ export default function DialogCreateVehicle({ isOpen, onClose, onCreated, editin
       placement="center"
     >
       <Portal>
-        <Dialog.Backdrop/>
+        <Dialog.Backdrop />
         <Dialog.Positioner>
-          <Dialog.Content bg="#2c2b3c" color="#fff" borderRadius="lg" maxW="500px">
+          <Dialog.Content
+            bg="#2c2b3c"
+            color="#fff"
+            borderRadius="lg"
+            maxW="500px"
+          >
             <Dialog.Header>
-              <Dialog.Title fontFamily="Montserrat" color="white" fontSize="xl" fontWeight="bold">
+              <Dialog.Title
+                fontFamily="Montserrat"
+                color="white"
+                fontSize="xl"
+                fontWeight="bold"
+              >
                 {editingVehicle ? "Editar Veículo" : "Adicionar Veículo"}
               </Dialog.Title>
             </Dialog.Header>
@@ -125,14 +147,19 @@ export default function DialogCreateVehicle({ isOpen, onClose, onCreated, editin
               <Box>
                 <VStack spacing={4} align="stretch">
                   <Box>
-                    <FormLabel fontFamily="Montserrat" color="white" fontWeight="500" mb={2}>
+                    <FormLabel
+                      fontFamily="Montserrat"
+                      color="white"
+                      fontWeight="500"
+                      mb={2}
+                    >
                       Modelo do Veículo
                     </FormLabel>
                     <Input
                       fontFamily="Montserrat"
                       placeholder="Ex: Mercedes Sprinter"
                       value={modelo}
-                      onChange={e => setModelo(e.target.value)}
+                      onChange={(e) => setModelo(e.target.value)}
                       bg="#3a3947"
                       border="1px solid #4a4a5c"
                       color="#fff"
@@ -141,14 +168,19 @@ export default function DialogCreateVehicle({ isOpen, onClose, onCreated, editin
                   </Box>
 
                   <Box>
-                    <FormLabel fontFamily="Montserrat" color="white" fontWeight="500" mb={2}>
+                    <FormLabel
+                      fontFamily="Montserrat"
+                      color="white"
+                      fontWeight="500"
+                      mb={2}
+                    >
                       Placa
                     </FormLabel>
                     <Input
                       fontFamily="Montserrat"
                       placeholder="Ex: ABC-1234"
                       value={placa}
-                      onChange={e => setPlaca(e.target.value)}
+                      onChange={(e) => setPlaca(e.target.value)}
                       bg="#3a3947"
                       border="1px solid #4a4a5c"
                       color="#fff"
@@ -157,14 +189,19 @@ export default function DialogCreateVehicle({ isOpen, onClose, onCreated, editin
                   </Box>
 
                   <Box>
-                    <FormLabel fontFamily="Montserrat" color="white" fontWeight="500" mb={2}>
+                    <FormLabel
+                      fontFamily="Montserrat"
+                      color="white"
+                      fontWeight="500"
+                      mb={2}
+                    >
                       Descrição
                     </FormLabel>
                     <Input
                       fontFamily="Montserrat"
                       placeholder="Breve descrição do veículo"
                       value={descricao}
-                      onChange={e => setDescricao(e.target.value)}
+                      onChange={(e) => setDescricao(e.target.value)}
                       bg="#3a3947"
                       border="1px solid #4a4a5c"
                       color="#fff"
@@ -173,14 +210,19 @@ export default function DialogCreateVehicle({ isOpen, onClose, onCreated, editin
                   </Box>
 
                   <Box>
-                    <FormLabel fontFamily="Montserrat" color="white" fontWeight="500" mb={2}>
+                    <FormLabel
+                      fontFamily="Montserrat"
+                      color="white"
+                      fontWeight="500"
+                      mb={2}
+                    >
                       Capacidade (passageiros)
                     </FormLabel>
                     <Input
                       fontFamily="Montserrat"
                       placeholder="Ex: 30"
                       value={capacidade}
-                      onChange={e => setCapacidade(e.target.value)}
+                      onChange={(e) => setCapacidade(e.target.value)}
                       bg="#3a3947"
                       border="1px solid #4a4a5c"
                       color="#fff"
@@ -189,7 +231,12 @@ export default function DialogCreateVehicle({ isOpen, onClose, onCreated, editin
                   </Box>
 
                   <Box>
-                    <FormLabel fontFamily="Montserrat" color="white" fontWeight="500" mb={2}>
+                    <FormLabel
+                      fontFamily="Montserrat"
+                      color="white"
+                      fontWeight="500"
+                      mb={2}
+                    >
                       Imagem do Veículo
                     </FormLabel>
                     <FileUpload.Root
@@ -199,35 +246,58 @@ export default function DialogCreateVehicle({ isOpen, onClose, onCreated, editin
                       onChange={handleFileChange}
                     >
                       <FileUpload.HiddenInput />
-                      <FileUpload.Dropzone 
-                        bg="#3a3947" 
+                      <FileUpload.Dropzone
+                        bg="#3a3947"
                         border="2px dashed #4a4a5c"
                         borderRadius="md"
                         p={6}
                         _hover={{ borderColor: "#fdb525", bg: "#454454" }}
                         transition="all 0.2s"
                       >
-                        <Icon as={LuUpload} boxSize={8} color="#fdb525" mb={3} />
+                        <Icon
+                          as={LuUpload}
+                          boxSize={8}
+                          color="#fdb525"
+                          mb={3}
+                        />
                         <FileUpload.DropzoneContent>
-                          <Box color="#fff" fontFamily="Montserrat" fontSize="md" fontWeight="500" mb={1}>
+                          <Box
+                            color="#fff"
+                            fontFamily="Montserrat"
+                            fontSize="md"
+                            fontWeight="500"
+                            mb={1}
+                          >
                             Arraste e solte a imagem aqui
                           </Box>
-                          <Box color="#a0a0a0" fontFamily="Montserrat" fontSize="sm">
+                          <Box
+                            color="#a0a0a0"
+                            fontFamily="Montserrat"
+                            fontSize="sm"
+                          >
                             ou clique para selecionar (.png, .jpg até 5MB)
                           </Box>
                           {imagem && (
                             <Box mt={4} color="#fdb525" fontFamily="Montserrat">
-                              <Box 
-                                as="img" 
-                                src={imagem instanceof File ? URL.createObjectURL(imagem) : imagem} 
-                                alt="Preview" 
-                                maxH="120px" 
-                                borderRadius="md" 
+                              <Box
+                                as="img"
+                                src={
+                                  imagem instanceof File
+                                    ? URL.createObjectURL(imagem)
+                                    : imagem
+                                }
+                                alt="Preview"
+                                maxH="120px"
+                                borderRadius="md"
                                 mb={2}
                                 border="2px solid #fdb525"
                               />
-                              <Box wordBreak="break-all" fontSize="sm" color="#fff">
-                                {imagem.name || 'Imagem selecionada'}
+                              <Box
+                                wordBreak="break-all"
+                                fontSize="sm"
+                                color="#fff"
+                              >
+                                {imagem.name || "Imagem selecionada"}
                               </Box>
                             </Box>
                           )}
@@ -260,11 +330,7 @@ export default function DialogCreateVehicle({ isOpen, onClose, onCreated, editin
             </Dialog.Body>
             <Dialog.Footer />
             <Dialog.CloseTrigger asChild>
-              <CloseButton 
-                size="sm" 
-                color="white"
-                _hover={{ bg: "#3a3947" }}
-              />
+              <CloseButton size="sm" color="white" _hover={{ bg: "#3a3947" }} />
             </Dialog.CloseTrigger>
           </Dialog.Content>
         </Dialog.Positioner>

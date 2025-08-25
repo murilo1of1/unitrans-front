@@ -6,6 +6,7 @@ import api from "@/utils/axios";
 import TabelaVeiculos from "@/components/tableVehiclesNew";
 import InputPesquisa from "@/components/inputPesquisa";
 import DialogCreateVehicle from "@/components/dialogCreateVehicle";
+import DialogConfirmation from "@/components/dialogConfirmation";
 
 export default function Admin() {
   const [vehicles, setVehicles] = useState([]);
@@ -14,6 +15,10 @@ export default function Admin() {
   const [search, setSearch] = useState("");
   const [activeSection, setActiveSection] = useState("veiculos");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingVehicle, setEditingVehicle] = useState(null);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [vehicleToDelete, setVehicleToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
 
   const decodeToken = (token) => {
@@ -47,23 +52,50 @@ export default function Admin() {
   const handleVehicleCreated = () => {
     const token = localStorage.getItem("token");
     const decodedToken = decodeToken(token);
-    
+
     if (decodedToken && decodedToken.idEmpresa) {
       fetchVehicles(decodedToken.idEmpresa, token);
+    }
+  };
+
+  const handleEditVehicle = (vehicle) => {
+    setEditingVehicle(vehicle);
+    setIsDialogOpen(true);
+  };
+
+  const handleDeleteVehicle = (vehicleId) => {
+    setVehicleToDelete(vehicleId);
+    setIsConfirmDialogOpen(true);
+  };
+
+  const confirmDeleteVehicle = async () => {
+    if (!vehicleToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      const token = localStorage.getItem("token");
+      await api.delete(`/veiculo/${vehicleToDelete}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      handleVehicleCreated(); // Atualiza a lista
+    } catch (error) {
+      console.error("Erro ao deletar veículo:", error);
+    } finally {
+      setIsDeleting(false);
+      setVehicleToDelete(null);
     }
   };
 
   const fetchVehicles = async (idEmpresa, token) => {
     setLoading(true);
     try {
-      const response = await api.get(
-        `/empresa/${idEmpresa}/veiculos`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await api.get(`/empresa/${idEmpresa}/veiculos`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (response.data && response.data.data) {
         setVehicles(
@@ -84,7 +116,7 @@ export default function Admin() {
     }
   };
 
-    const filteredVehicles = vehicles.filter(
+  const filteredVehicles = vehicles.filter(
     (item) =>
       item.descricao?.toLowerCase().includes(search.toLowerCase()) ||
       item.modelo?.toLowerCase().includes(search.toLowerCase()) ||
@@ -114,7 +146,7 @@ export default function Admin() {
             >
               <InputPesquisa
                 value={search}
-                onChange={e => setSearch(e.target.value)}
+                onChange={(e) => setSearch(e.target.value)}
                 placeholder="Pesquisar veículo..."
               />
               <Button
@@ -123,13 +155,22 @@ export default function Admin() {
                 fontFamily="Montserrat"
                 fontWeight="bold"
                 ml={2}
-                _hover={{ bg: "#f59e0b", transform: "scale(1.02)", transition: "0.3s" }}
+                _hover={{
+                  bg: "#f59e0b",
+                  transform: "scale(1.02)",
+                  transition: "0.3s",
+                }}
                 onClick={() => setIsDialogOpen(true)}
               >
                 + Adicionar Veículo
               </Button>
             </Flex>
-            <TabelaVeiculos vehicles={filteredVehicles} loading={loading} />
+            <TabelaVeiculos
+              vehicles={filteredVehicles}
+              loading={loading}
+              onEdit={handleEditVehicle}
+              onDelete={handleDeleteVehicle}
+            />
           </Box>
         );
       case "alunos":
@@ -149,7 +190,14 @@ export default function Admin() {
           </Box>
         );
       default:
-        return <TabelaVeiculos vehicles={vehicles} loading={loading} />;
+        return (
+          <TabelaVeiculos
+            vehicles={vehicles}
+            loading={loading}
+            onEdit={handleEditVehicle}
+            onDelete={handleDeleteVehicle}
+          />
+        );
     }
   };
 
@@ -306,9 +354,26 @@ export default function Admin() {
 
       <DialogCreateVehicle
         isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
+        onClose={() => {
+          setIsDialogOpen(false);
+          setEditingVehicle(null);
+        }}
         onCreated={handleVehicleCreated}
+        editingVehicle={editingVehicle}
         idEmpresa={empresa?.idEmpresa}
+      />
+
+      <DialogConfirmation
+        isOpen={isConfirmDialogOpen}
+        onClose={() => {
+          setIsConfirmDialogOpen(false);
+          setVehicleToDelete(null);
+        }}
+        onConfirm={confirmDeleteVehicle}
+        message="Tem certeza que deseja excluir este veículo? Esta ação não pode ser desfeita."
+        confirmText="Excluir"
+        cancelText="Cancelar"
+        isLoading={isDeleting}
       />
     </Box>
   );

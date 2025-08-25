@@ -19,23 +19,53 @@ export default function DialogForgotPassword({ isOpen, onClose }) {
   const [email, setEmail] = useState("");
   const [token, setToken] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [userType, setUserType] = useState("");
 
   const sendEmail = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.post("/users/forgot-password", { email });
-      if (response.status === 200) {
+      let alunoSuccess = false;
+      let empresaSuccess = false;
+
+      try {
+        const response = await axios.post("/aluno/forgot-password", { email });
+        console.log("Resposta do endpoint aluno:", response.data);
+        if (response.status === 200) {
+          alunoSuccess = true;
+        }
+      } catch (error) {
+        console.log("Erro no endpoint aluno:", error.response?.status);
+      }
+
+      try {
+        const response = await axios.post("/empresa/forgot-password", {
+          email,
+        });
+        console.log("Resposta do endpoint empresa:", response.data);
+        if (response.status === 200) {
+          empresaSuccess = true;
+        }
+      } catch (error) {
+        console.log("Erro no endpoint empresa:", error.response?.status);
+      }
+
+      if (alunoSuccess || empresaSuccess) {
+        setUserType("aluno");
         setStep(2);
+        toaster.create({
+          title: "Se o e-mail existir em nosso sistema, o código foi enviado!",
+          type: "success",
+        });
       } else {
         toaster.create({
-          title: "Erro ao enviar o e-mail. Por favor, tente novamente.",
+          title: "Erro de conexão. Tente novamente.",
           type: "error",
         });
       }
     } catch (error) {
-      console.error("Erro ao enviar o e-mail:", error);
+      console.error("Erro geral:", error);
       toaster.create({
-        title: "Erro ao enviar o e-mail!",
+        title: "Erro ao processar solicitação!",
         type: "error",
       });
     } finally {
@@ -44,29 +74,65 @@ export default function DialogForgotPassword({ isOpen, onClose }) {
   };
 
   const resetPassword = async () => {
+    setIsLoading(true);
     try {
-      const response = await axios.post("/users/reset-password", {
-        token,
-        newPassword,
-      });
-      if (response.status === 200) {
-        toaster.create({
-          title: "Senha alterada com sucesso!",
-          type: "success",
+      let resetSuccess = false;
+
+      try {
+        const response = await axios.post("/aluno/reset-password", {
+          token,
+          newPassword,
         });
+
+        if (response.status === 200) {
+          resetSuccess = true;
+          toaster.create({
+            title: "Senha alterada com sucesso!",
+            type: "success",
+          });
+        }
+      } catch (error) {
+        console.log("Reset como aluno falhou, tentando como empresa...");
+
+        try {
+          const response = await axios.post("/empresa/reset-password", {
+            token,
+            newPassword,
+          });
+
+          if (response.status === 200) {
+            resetSuccess = true;
+            toaster.create({
+              title: "Senha alterada com sucesso!",
+              type: "success",
+            });
+          }
+        } catch (empresaError) {
+          console.log("Reset como empresa também falhou");
+        }
+      }
+
+      if (resetSuccess) {
+        setStep(1);
+        setEmail("");
+        setToken("");
+        setNewPassword("");
+        setUserType("");
         onClose();
       } else {
         toaster.create({
-          title:
-            "Erro ao alterar a senha. Verifique o código e tente novamente.",
+          title: "Código inválido ou expirado. Verifique e tente novamente.",
           type: "error",
         });
       }
     } catch (error) {
       console.error("Erro ao redefinir a senha:", error);
-      alert(
-        "Ocorreu um erro ao redefinir a senha. Por favor, tente novamente."
-      );
+      toaster.create({
+        title: "Erro ao redefinir a senha. Tente novamente.",
+        type: "error",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -91,7 +157,11 @@ export default function DialogForgotPassword({ isOpen, onClose }) {
                 <VStack spacing={4}>
                   {step === 1 && (
                     <>
-                      <FormLabel htmlFor="email" color="white" fontFamily="Montserrat"></FormLabel>
+                      <FormLabel
+                        htmlFor="email"
+                        color="white"
+                        fontFamily="Montserrat"
+                      ></FormLabel>
                       <Input
                         fontFamily="Montserrat"
                         id="email"
@@ -108,6 +178,7 @@ export default function DialogForgotPassword({ isOpen, onClose }) {
                         fontWeight="bold"
                         onClick={sendEmail}
                         color="white"
+                        isLoading={isLoading}
                         _hover={{
                           opacity: 0.9,
                           transform: "scale(1.01)",
@@ -120,7 +191,11 @@ export default function DialogForgotPassword({ isOpen, onClose }) {
                   )}
                   {step === 2 && (
                     <>
-                      <FormLabel htmlFor="token" color="white" fontFamily="Montserrat">
+                      <FormLabel
+                        htmlFor="token"
+                        color="white"
+                        fontFamily="Montserrat"
+                      >
                         Código de recuperação
                       </FormLabel>
                       <Input
@@ -132,7 +207,13 @@ export default function DialogForgotPassword({ isOpen, onClose }) {
                         color="white"
                         _placeholder={{ color: "gray.400" }}
                       />
-                      <FormLabel htmlFor="new-password" color="white" fontFamily="Montserrat">Nova senha</FormLabel>
+                      <FormLabel
+                        htmlFor="new-password"
+                        color="white"
+                        fontFamily="Montserrat"
+                      >
+                        Nova senha
+                      </FormLabel>
                       <Input
                         fontFamily="Montserrat"
                         id="new-password"
@@ -149,6 +230,7 @@ export default function DialogForgotPassword({ isOpen, onClose }) {
                         background="#fdb525"
                         w="100%"
                         onClick={resetPassword}
+                        isLoading={isLoading}
                         _hover={{
                           opacity: 0.9,
                           transform: "scale(1.01)",
@@ -164,7 +246,7 @@ export default function DialogForgotPassword({ isOpen, onClose }) {
             </Dialog.Body>
             <Dialog.Footer></Dialog.Footer>
             <Dialog.CloseTrigger asChild>
-              <CloseButton size="sm" color="white" bg="transparent"/>
+              <CloseButton size="sm" color="white" bg="transparent" />
             </Dialog.CloseTrigger>
           </Dialog.Content>
         </Dialog.Positioner>

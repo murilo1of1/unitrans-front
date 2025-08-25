@@ -13,7 +13,7 @@ import { FaMapMarkedAlt } from "react-icons/fa";
 
 import { Toaster, toaster } from "@/components/ui/toaster";
 
-const TabelaVeiculos = ({ vehicles, loading }) => {
+const TabelaVeiculos = ({ vehicles, loading, onEdit, onDelete }) => {
   if (loading) {
     return (
       <Flex justify="center" align="center" minH="200px">
@@ -49,9 +49,7 @@ const TabelaVeiculos = ({ vehicles, loading }) => {
                 fontSize="sm"
                 color="#64748B"
                 borderBottom="1px solid #E2E8F0"
-              >
-
-              </Table.ColumnHeader>
+              ></Table.ColumnHeader>
               <Table.ColumnHeader
                 fontFamily="Montserrat"
                 textAlign="center"
@@ -121,9 +119,21 @@ const TabelaVeiculos = ({ vehicles, loading }) => {
                 bg={index % 2 === 0 ? "white" : "#F8FAFC"}
                 _hover={{ bg: "#F1F5F9" }}
               >
-                <Table.Cell justifyContent="center" display="flex" alignItems="center">
+                <Table.Cell
+                  justifyContent="center"
+                  display="flex"
+                  alignItems="center"
+                >
                   {vehicle.imagem && (
-                    <img src={vehicle.imagem} style={{ width: 130, height: 80, objectFit: "cover", borderRadius: 12 }} />
+                    <img
+                      src={vehicle.imagem}
+                      style={{
+                        width: 130,
+                        height: 80,
+                        objectFit: "cover",
+                        borderRadius: 12,
+                      }}
+                    />
                   )}
                 </Table.Cell>
                 <Table.Cell
@@ -183,6 +193,7 @@ const TabelaVeiculos = ({ vehicles, loading }) => {
                       color="#64748B"
                       _hover={{ color: "#3B82F6", bg: "#F1F5F9" }}
                       p={2}
+                      onClick={() => onEdit && onEdit(vehicle)}
                     >
                       <FiEdit2 size={16} />
                     </Button>
@@ -192,6 +203,7 @@ const TabelaVeiculos = ({ vehicles, loading }) => {
                       color="#64748B"
                       _hover={{ color: "#EF4444", bg: "#FEF2F2" }}
                       p={2}
+                      onClick={() => onDelete && onDelete(vehicle.id)}
                     >
                       <FiTrash2 size={16} />
                     </Button>
