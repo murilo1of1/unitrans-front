@@ -1,11 +1,4 @@
-# 🚌 UniTrans### 🎯 Funcionalidades Principais
-
-- 🔐 **Autenticação unificada** para alunos e empresas
-- 🚌 **Gestão de veículos** com upload de imagens
-- 🔗 **Sistema de vínculos** aluno-empresa (via token ou solicitação)
-- 📊 **Dashboard administrativo** para empresas
-- 🏢 **Área do aluno** para gerenciar empresas vinculadas
-- 📱 **Interface responsiva** e modernad
+# 🚌 UniTrans Frontend
 
 <div align="center">
   <img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js" />
@@ -20,9 +13,9 @@
 
 ### 🎯 Funcionalidades Principais
 
-- � **Autenticação unificada** para alunos e empresas
-- � **Gestão de veículos** com upload de imagens
-- � **Sistema de vínculos** aluno-empresa (via token ou solicitação)
+- 🔐 **Autenticação unificada** para alunos e empresas
+- 🚌 **Gestão de veículos** com upload de imagens
+- 🔗 **Sistema de vínculos** aluno-empresa (via token ou solicitação)
 - 📊 **Dashboard administrativo** para empresas
 - 🏢 **Área do aluno** para gerenciar empresas vinculadas
 - 📱 **Interface responsiva** e moderna
