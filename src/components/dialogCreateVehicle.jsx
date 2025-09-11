@@ -36,7 +36,7 @@ export default function DialogCreateVehicle({
       setPlaca(editingVehicle.placa || "");
       setDescricao(editingVehicle.descricao || "");
       setCapacidade(editingVehicle.capacidade || "");
-      setImagem(""); // Deixa imagem vazia para substituir a antiga
+      setImagem(editingVehicle.imagem || "");
     } else if (isOpen && !editingVehicle) {
       setModelo("");
       setPlaca("");
@@ -284,20 +284,35 @@ export default function DialogCreateVehicle({
                                 src={
                                   imagem instanceof File
                                     ? URL.createObjectURL(imagem)
-                                    : imagem
+                                    : imagem.startsWith("http")
+                                    ? imagem
+                                    : `http://localhost:3000${
+                                        imagem.startsWith("/")
+                                          ? imagem
+                                          : `/${imagem}`
+                                      }`
                                 }
                                 alt="Preview"
                                 maxH="120px"
                                 borderRadius="md"
                                 mb={2}
                                 border="2px solid #fdb525"
+                                onError={(e) => {
+                                  console.log(
+                                    "Erro ao carregar imagem:",
+                                    e.target.src
+                                  );
+                                  e.target.style.display = "none";
+                                }}
                               />
                               <Box
                                 wordBreak="break-all"
                                 fontSize="sm"
                                 color="#fff"
                               >
-                                {imagem.name || "Imagem selecionada"}
+                                {imagem instanceof File
+                                  ? imagem.name
+                                  : "Imagem atual do veículo"}
                               </Box>
                             </Box>
                           )}
