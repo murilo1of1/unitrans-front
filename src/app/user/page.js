@@ -4,11 +4,14 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/utils/axios";
 import DialogAddCompany from "@/components/dialogAddCompany";
+import TableSolicitationsUser from "@/components/tableSolicitationsUser";
 
 export default function User() {
   const [companies, setCompanies] = useState([]);
+  const [solicitations, setSolicitations] = useState([]);
   const [aluno, setAluno] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loadingSolicitations, setLoadingSolicitations] = useState(false);
   const [activeSection, setActiveSection] = useState("empresas");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const router = useRouter();
@@ -39,12 +42,22 @@ export default function User() {
 
   const handleSectionChange = (section) => {
     setActiveSection(section);
+
+    if (section === "solicitacoes") {
+      const token = localStorage.getItem("token");
+      const decodedToken = decodeToken(token);
+
+      if (decodedToken && (decodedToken.idAluno || decodedToken.id)) {
+        const studentId = decodedToken.idAluno || decodedToken.id;
+        fetchSolicitations(studentId, token);
+      }
+    }
   };
 
   const handleCompanyAdded = () => {
     const token = localStorage.getItem("token");
     const decodedToken = decodeToken(token);
-    
+
     if (decodedToken && (decodedToken.idAluno || decodedToken.id)) {
       const studentId = decodedToken.idAluno || decodedToken.id;
       fetchCompanies(studentId, token);
@@ -54,14 +67,11 @@ export default function User() {
   const fetchCompanies = async (idAluno, token) => {
     setLoading(true);
     try {
-      const response = await api.get(
-        `/vinculo/aluno/${idAluno}?ativo=true`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await api.get(`/vinculo/aluno/${idAluno}?ativo=true`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (response.data && response.data.data) {
         setCompanies(
@@ -79,6 +89,34 @@ export default function User() {
       setCompanies([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchSolicitations = async (idAluno, token) => {
+    setLoadingSolicitations(true);
+    try {
+      const response = await api.get(`/vinculo/solicitacao/aluno/${idAluno}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.data && response.data.data) {
+        setSolicitations(
+          Array.isArray(response.data.data) ? response.data.data : []
+        );
+      } else {
+        setSolicitations([]);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar solicitações:", error);
+      if (error.response?.status === 401) {
+        localStorage.removeItem("token");
+        router.push("/login");
+      }
+      setSolicitations([]);
+    } finally {
+      setLoadingSolicitations(false);
     }
   };
 
@@ -123,7 +161,12 @@ export default function User() {
               </Box>
             ) : companies.length === 0 ? (
               <Box textAlign="center" py={12}>
-                <Text fontFamily="Montserrat" fontSize="lg" color="gray.500" mb={4}>
+                <Text
+                  fontFamily="Montserrat"
+                  fontSize="lg"
+                  color="gray.500"
+                  mb={4}
+                >
                   Você ainda não está vinculado a nenhuma empresa.
                 </Text>
                 <Text fontFamily="Montserrat" color="gray.400" mb={6}>
@@ -141,10 +184,11 @@ export default function User() {
                     border="1px solid #E2E8F0"
                     mb={4}
                     p={6}
-                    _hover={{ 
-                      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)", 
-                      transform: "translateY(-1px)", 
-                      transition: "all 0.2s" 
+                    _hover={{
+                      boxShadow:
+                        "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+                      transform: "translateY(-1px)",
+                      transition: "all 0.2s",
                     }}
                   >
                     <Flex justifyContent="space-between" alignItems="center">
@@ -177,7 +221,8 @@ export default function User() {
                             fontSize="sm"
                             color="gray.500"
                           >
-                            Vinculado em {new Date(vinculo.dataVinculo).toLocaleDateString()}
+                            Vinculado em{" "}
+                            {new Date(vinculo.dataVinculo).toLocaleDateString()}
                           </Text>
                         </Box>
                       </Flex>
@@ -187,10 +232,10 @@ export default function User() {
                         color="#64748B"
                         border="1px solid #E2E8F0"
                         fontFamily="Montserrat"
-                        _hover={{ 
-                          color: "#334155", 
+                        _hover={{
+                          color: "#334155",
                           bg: "#F1F5F9",
-                          borderColor: "#CBD5E1"
+                          borderColor: "#CBD5E1",
                         }}
                       >
                         Ver Veículos
@@ -212,10 +257,22 @@ export default function User() {
         );
       case "solicitacoes":
         return (
-          <Box textAlign="center" mt={8}>
-            <Text fontFamily="Montserrat" fontSize="lg" color="gray.600">
-              Seção de Solicitações - Em desenvolvimento
-            </Text>
+          <Box>
+            <Flex justifyContent="space-between" alignItems="center" mb={6}>
+              <Text
+                fontSize="2xl"
+                fontWeight="bold"
+                color="#334155"
+                fontFamily="Montserrat"
+              >
+                Suas Solicitações
+              </Text>
+            </Flex>
+
+            <TableSolicitationsUser
+              solicitations={solicitations}
+              loading={loadingSolicitations}
+            />
           </Box>
         );
       case "configuracoes":
