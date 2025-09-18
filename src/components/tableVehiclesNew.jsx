@@ -9,7 +9,6 @@ import {
   HStack,
 } from "@chakra-ui/react";
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
-import { FaMapMarkedAlt } from "react-icons/fa";
 
 import { Toaster, toaster } from "@/components/ui/toaster";
 
@@ -206,15 +205,6 @@ const TabelaVeiculos = ({ vehicles, loading, onEdit, onDelete }) => {
                       onClick={() => onDelete && onDelete(vehicle.id)}
                     >
                       <FiTrash2 size={16} />
-                    </Button>
-                    <Button
-                      size="sm"
-                      bg="transparent"
-                      color="#64748B"
-                      _hover={{ color: "#18c418ff", bg: "#f2fef4ff" }}
-                      p={2}
-                    >
-                      <FaMapMarkedAlt size={16} />
                     </Button>
                   </HStack>
                 </Table.Cell>

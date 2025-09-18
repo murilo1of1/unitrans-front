@@ -20,15 +20,21 @@ import DialogCreateVehicle from "@/components/dialogCreateVehicle";
 import DialogGenerateToken from "@/components/dialogGenerateToken";
 import DialogConfirmation from "@/components/dialogConfirmation";
 import { toaster } from "@/components/ui/toaster";
+import { FiEdit2 } from "react-icons/fi";
+import { FaMapMarkedAlt } from "react-icons/fa";
 
 export default function Admin() {
   const [vehicles, setVehicles] = useState([]);
   const [students, setStudents] = useState([]);
   const [solicitations, setSolicitations] = useState([]);
+  const [rotas, setRotas] = useState([]);
+  const [pontos, setPontos] = useState([]);
   const [empresa, setEmpresa] = useState(null);
   const [loading, setLoading] = useState(true);
   const [loadingStudents, setLoadingStudents] = useState(false);
   const [loadingSolicitations, setLoadingSolicitations] = useState(false);
+  const [loadingRotas, setLoadingRotas] = useState(false);
+  const [loadingPontos, setLoadingPontos] = useState(false);
   const [search, setSearch] = useState("");
   const [activeSection, setActiveSection] = useState("veiculos");
   const [studentsStep, setStudentsStep] = useState(0); // 0 = Alunos vinculados, 1 = Solicitações
@@ -72,6 +78,10 @@ export default function Admin() {
       const token = localStorage.getItem("token");
       fetchStudents(empresa.idEmpresa, token);
       fetchSolicitations(empresa.idEmpresa, token);
+    } else if (section === "rotas" && empresa?.idEmpresa) {
+      const token = localStorage.getItem("token");
+      fetchRotas(empresa.idEmpresa, token);
+      fetchPontos(empresa.idEmpresa, token);
     }
   };
 
@@ -316,6 +326,58 @@ export default function Admin() {
     }
   };
 
+  const fetchRotas = async (idEmpresa, token) => {
+    setLoadingRotas(true);
+    try {
+      const response = await api.get(`/empresa/${idEmpresa}/rotas`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.data && response.data.data) {
+        setRotas(Array.isArray(response.data.data) ? response.data.data : []);
+      } else {
+        setRotas([]);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar rotas:", error);
+      if (error.response?.status === 401) {
+        localStorage.removeItem("token");
+        router.push("/login");
+      }
+      setRotas([]);
+    } finally {
+      setLoadingRotas(false);
+    }
+  };
+
+  const fetchPontos = async (idEmpresa, token) => {
+    setLoadingPontos(true);
+    try {
+      const response = await api.get(`/empresa/${idEmpresa}/pontos`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.data && response.data.data) {
+        setPontos(Array.isArray(response.data.data) ? response.data.data : []);
+      } else {
+        setPontos([]);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar pontos:", error);
+      if (error.response?.status === 401) {
+        localStorage.removeItem("token");
+        router.push("/login");
+      }
+      setPontos([]);
+    } finally {
+      setLoadingPontos(false);
+    }
+  };
+
   const filteredVehicles = vehicles.filter(
     (item) =>
       item.descricao?.toLowerCase().includes(search.toLowerCase()) ||
@@ -516,6 +578,204 @@ export default function Admin() {
             )}
           </Box>
         );
+      case "rotas":
+        return (
+          <Box>
+            <Flex justifyContent="space-between" alignItems="center" mb={6}>
+              <Text
+                fontSize="2xl"
+                fontWeight="bold"
+                color="#334155"
+                fontFamily="Montserrat"
+              >
+                Gestão de Rotas e Pontos
+              </Text>
+              <HStack spacing={3}>
+                <Button
+                  bg="#fdb525"
+                  color="white"
+                  fontFamily="Montserrat"
+                  fontWeight="bold"
+                  borderRadius="md"
+                  px={4}
+                  py={2}
+                  _hover={{
+                    bg: "#f59e0b",
+                    transform: "scale(1.02)",
+                    transition: "0.3s",
+                  }}
+                  onClick={() => {
+                    // TODO: Implementar dialog criar ponto
+                    toaster.create({
+                      title: "Funcionalidade em desenvolvimento",
+                      description:
+                        "Dialog para criar ponto será implementado em breve",
+                      type: "info",
+                    });
+                  }}
+                >
+                  + Criar Ponto
+                </Button>
+                <Button
+                  bg="#fdb525"
+                  color="white"
+                  fontFamily="Montserrat"
+                  fontWeight="bold"
+                  borderRadius="md"
+                  px={4}
+                  py={2}
+                  _hover={{
+                    bg: "#f59e0b",
+                    transform: "scale(1.02)",
+                    transition: "0.3s",
+                  }}
+                  onClick={() => {
+                    // TODO: Implementar dialog criar rota
+                    toaster.create({
+                      title: "Funcionalidade em desenvolvimento",
+                      description:
+                        "Dialog para criar rota será implementado em breve",
+                      type: "info",
+                    });
+                  }}
+                >
+                  + Criar Rota
+                </Button>
+              </HStack>
+            </Flex>
+
+            {loadingRotas ? (
+              <Box textAlign="center" py={8}>
+                <Text fontFamily="Montserrat" color="gray.500">
+                  Carregando rotas...
+                </Text>
+              </Box>
+            ) : rotas.length === 0 ? (
+              <Box textAlign="center" py={12}>
+                <Text
+                  fontFamily="Montserrat"
+                  fontSize="lg"
+                  color="gray.500"
+                  mb={4}
+                >
+                  Nenhuma rota cadastrada.
+                </Text>
+                <Text fontFamily="Montserrat" color="gray.400" mb={6}>
+                  Crie sua primeira rota para começar a gerenciar o transporte!
+                </Text>
+              </Box>
+            ) : (
+              <Box>
+                <Text
+                  fontSize="lg"
+                  fontWeight="bold"
+                  color="#334155"
+                  fontFamily="Montserrat"
+                  mb={4}
+                >
+                  Rotas Cadastradas ({rotas.length})
+                </Text>
+                {rotas.map((rota) => (
+                  <Box
+                    key={rota.id}
+                    bg="white"
+                    borderRadius="lg"
+                    boxShadow="0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)"
+                    border="1px solid #E2E8F0"
+                    mb={4}
+                    p={6}
+                    _hover={{
+                      boxShadow:
+                        "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+                      transform: "translateY(-1px)",
+                      transition: "all 0.2s",
+                    }}
+                  >
+                    <Flex justifyContent="space-between" alignItems="center">
+                      <Box>
+                        <Text
+                          fontFamily="Montserrat"
+                          fontSize="xl"
+                          fontWeight="bold"
+                          color="#334155"
+                          mb={2}
+                        >
+                          {rota.nome}
+                        </Text>
+                        <HStack spacing={4} mb={2}>
+                          <Text
+                            fontFamily="Montserrat"
+                            fontSize="sm"
+                            color="gray.600"
+                          >
+                            <Text as="span" fontWeight="bold">
+                              Origem:
+                            </Text>{" "}
+                            {rota.origem}
+                          </Text>
+                          <Text
+                            fontFamily="Montserrat"
+                            fontSize="sm"
+                            color="gray.600"
+                          >
+                            <Text as="span" fontWeight="bold">
+                              Destino:
+                            </Text>{" "}
+                            {rota.destino}
+                          </Text>
+                        </HStack>
+                      </Box>
+                      <HStack spacing={3}>
+                        <Button
+                          size="md"
+                          bg="transparent"
+                          color="#64748B"
+                          _hover={{ color: "#3B82F6", bg: "#F1F5F9" }}
+                          p={3}
+                          display="flex"
+                          alignItems="center"
+                          justifyContent="center"
+                          onClick={() => {
+                            // TODO: Implementar edição de rota
+                            toaster.create({
+                              title: "Funcionalidade em desenvolvimento",
+                              description:
+                                "Edição de rota será implementada em breve",
+                              type: "info",
+                            });
+                          }}
+                        >
+                          <FiEdit2 size={18} />
+                        </Button>
+                        <Button
+                          size="md"
+                          bg="transparent"
+                          color="#64748B"
+                          _hover={{ color: "#18c418ff", bg: "#f2fef4ff" }}
+                          p={3}
+                          display="flex"
+                          alignItems="center"
+                          justifyContent="center"
+                          onClick={() => {
+                            // TODO: Implementar gestão de pontos da rota
+                            toaster.create({
+                              title: "Funcionalidade em desenvolvimento",
+                              description:
+                                "Gestão de pontos da rota será implementada em breve",
+                              type: "info",
+                            });
+                          }}
+                        >
+                          <FaMapMarkedAlt size={18} />
+                        </Button>
+                      </HStack>
+                    </Flex>
+                  </Box>
+                ))}
+              </Box>
+            )}
+          </Box>
+        );
       case "financeiro":
         return (
           <Box textAlign="center" mt={8}>
@@ -643,6 +903,26 @@ export default function Admin() {
               onClick={() => handleSectionChange("veiculos")}
             >
               Veículos
+            </Button>
+            <Button
+              bg={activeSection === "rotas" ? "#fdb525" : "transparent"}
+              color="white"
+              fontFamily="Montserrat"
+              fontWeight="500"
+              justifyContent="flex-start"
+              borderRadius="lg"
+              py={6}
+              px={4}
+              mb={1}
+              leftIcon={<Text fontSize="md">🛣️</Text>}
+              _hover={{
+                bg: activeSection === "rotas" ? "#fdb525" : "#475569",
+                transform: "scale(1.01)",
+                transition: "0.2s",
+              }}
+              onClick={() => handleSectionChange("rotas")}
+            >
+              Rotas
             </Button>
             <Button
               bg={activeSection === "alunos" ? "#fdb525" : "transparent"}

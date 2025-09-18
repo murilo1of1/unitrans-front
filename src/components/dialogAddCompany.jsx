@@ -15,8 +15,13 @@ import { Toaster, toaster } from "@/components/ui/toaster";
 import api from "@/utils/axios";
 import { useState, useEffect } from "react";
 
-export default function DialogAddCompany({ isOpen, onClose, onCompanyAdded, idAluno }) {
-  const [methodType, setMethodType] = useState(""); 
+export default function DialogAddCompany({
+  isOpen,
+  onClose,
+  onCompanyAdded,
+  idAluno,
+}) {
+  const [methodType, setMethodType] = useState("");
   const [token, setToken] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [companies, setCompanies] = useState([]);
@@ -46,7 +51,9 @@ export default function DialogAddCompany({ isOpen, onClose, onCompanyAdded, idAl
       });
 
       if (response.data && response.data.data) {
-        setCompanies(Array.isArray(response.data.data) ? response.data.data : []);
+        setCompanies(
+          Array.isArray(response.data.data) ? response.data.data : []
+        );
       } else {
         setCompanies([]);
       }
@@ -95,7 +102,8 @@ export default function DialogAddCompany({ isOpen, onClose, onCompanyAdded, idAl
         onClose();
       }
     } catch (error) {
-      const errorMessage = error.response?.data?.message || "Erro ao usar token";
+      const errorMessage =
+        error.response?.data?.message || "Erro ao usar token";
       toaster.create({
         title: errorMessage,
         status: "error",
@@ -138,7 +146,8 @@ export default function DialogAddCompany({ isOpen, onClose, onCompanyAdded, idAl
         onClose();
       }
     } catch (error) {
-      const errorMessage = error.response?.data?.message || "Erro ao enviar solicitação";
+      const errorMessage =
+        error.response?.data?.message || "Erro ao enviar solicitação";
       toaster.create({
         title: errorMessage,
         status: "error",
@@ -161,7 +170,11 @@ export default function DialogAddCompany({ isOpen, onClose, onCompanyAdded, idAl
         p={6}
         borderRadius="md"
         fontWeight="bold"
-        _hover={{ bg: "#fdb525", transform: "scale(1.02)", transition: "transform 0.2s" }}
+        _hover={{
+          bg: "#fdb525",
+          transform: "scale(1.02)",
+          transition: "transform 0.2s",
+        }}
         onClick={() => setMethodType("token")}
       >
         <Text fontWeight="bold">Usar Token</Text>
@@ -174,7 +187,11 @@ export default function DialogAddCompany({ isOpen, onClose, onCompanyAdded, idAl
         p={6}
         borderRadius="md"
         fontWeight="bold"
-        _hover={{ bg: "#fdb525", transform: "scale(1.02)", transition: "transform 0.2s" }}
+        _hover={{
+          bg: "#fdb525",
+          transform: "scale(1.02)",
+          transition: "transform 0.2s",
+        }}
         onClick={() => {
           setMethodType("solicitacao");
           fetchCompanies();
@@ -188,7 +205,12 @@ export default function DialogAddCompany({ isOpen, onClose, onCompanyAdded, idAl
   const renderTokenMethod = () => (
     <VStack spacing={4} align="stretch">
       <Box>
-        <FormLabel fontFamily="Montserrat" color="#fdb525" fontWeight="500" mb={2}>
+        <FormLabel
+          fontFamily="Montserrat"
+          color="#fdb525"
+          fontWeight="500"
+          mb={2}
+        >
           Token de Acesso
         </FormLabel>
         <Input
@@ -227,7 +249,12 @@ export default function DialogAddCompany({ isOpen, onClose, onCompanyAdded, idAl
   const renderRequestMethod = () => (
     <VStack spacing={4} align="stretch">
       <Box>
-        <FormLabel fontFamily="Montserrat" color="#fdb525" fontWeight="500" mb={2}>
+        <FormLabel
+          fontFamily="Montserrat"
+          color="#fdb525"
+          fontWeight="500"
+          mb={2}
+        >
           Buscar Empresa
         </FormLabel>
         <Input
@@ -267,11 +294,16 @@ export default function DialogAddCompany({ isOpen, onClose, onCompanyAdded, idAl
                 justifyContent="flex-start"
                 borderRadius="md"
                 mb={2}
-                p={4}
-                border={selectedCompany?.id === company.id ? "2px solid #fdb525" : "2px solid transparent"}
+                minH="60px"
+                border={
+                  selectedCompany?.id === company.id
+                    ? "2px solid #fdb525"
+                    : "2px solid transparent"
+                }
                 _hover={{
                   bg: "#454454",
-                  borderColor: selectedCompany?.id === company.id ? "#fdb525" : "#6b7280",
+                  borderColor:
+                    selectedCompany?.id === company.id ? "#fdb525" : "#6b7280",
                 }}
                 onClick={() => setSelectedCompany(company)}
               >
@@ -321,9 +353,19 @@ export default function DialogAddCompany({ isOpen, onClose, onCompanyAdded, idAl
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner>
-          <Dialog.Content bg="#2c2b3c" color="#fff" borderRadius="lg" maxW="500px">
+          <Dialog.Content
+            bg="#2c2b3c"
+            color="#fff"
+            borderRadius="lg"
+            maxW="500px"
+          >
             <Dialog.Header>
-              <Dialog.Title fontFamily="Montserrat" color="#fdb525" fontSize="xl" fontWeight="bold">
+              <Dialog.Title
+                fontFamily="Montserrat"
+                color="#fdb525"
+                fontSize="xl"
+                fontWeight="bold"
+              >
                 Adicionar Empresa
               </Dialog.Title>
             </Dialog.Header>
@@ -344,14 +386,14 @@ export default function DialogAddCompany({ isOpen, onClose, onCompanyAdded, idAl
                 position="absolute"
                 mt="8px"
                 ml={408}
-                _hover={{ bg: "#3a3947"}}
+                _hover={{ bg: "#3a3947" }}
               >
                 ←
               </Button>
             )}
             <Dialog.CloseTrigger asChild>
-              <CloseButton 
-                size="sm" 
+              <CloseButton
+                size="sm"
                 color="#fdb525"
                 _hover={{ bg: "#3a3947" }}
               />
