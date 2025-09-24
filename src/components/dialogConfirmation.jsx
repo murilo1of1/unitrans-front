@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 
 export default function DialogConfirmation({
-  isOpen,
+  isOpen,   
   onClose,
   onConfirm,
   message,
