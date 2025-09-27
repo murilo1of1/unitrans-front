@@ -393,20 +393,6 @@ export default function User() {
                           {new Date(vinculo.dataVinculo).toLocaleDateString()}
                         </Text>
                       </Box>
-                      <Button
-                        size="sm"
-                        bg="transparent"
-                        color="#64748B"
-                        border="1px solid #E2E8F0"
-                        fontFamily="Montserrat"
-                        _hover={{
-                          color: "#334155",
-                          bg: "#F1F5F9",
-                          borderColor: "#CBD5E1",
-                        }}
-                      >
-                        Ver Veículos
-                      </Button>
                     </Flex>
                   </Card.Root>
                 ))}

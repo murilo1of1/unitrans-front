@@ -12,19 +12,21 @@ import {
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/utils/axios";
-import TabelaVeiculos from "@/components/tableVehiclesNew";
+
 import TableStudents from "@/components/tableStudents";
 import TableSolicitations from "@/components/tableSolicitations";
 import InputPesquisa from "@/components/inputPesquisa";
-import DialogCreateVehicle from "@/components/dialogCreateVehicle";
+
 import DialogGenerateToken from "@/components/dialogGenerateToken";
 import DialogConfirmation from "@/components/dialogConfirmation";
+import DialogCreatePoint from "@/components/dialogCreatePoint";
+import DialogCreateRoute from "@/components/dialogCreateRoute";
+import DialogManageRoutePoints from "@/components/dialogManageRoutePoints";
 import { toaster } from "@/components/ui/toaster";
 import { FiEdit2 } from "react-icons/fi";
 import { FaMapMarkedAlt } from "react-icons/fa";
 
 export default function Admin() {
-  const [vehicles, setVehicles] = useState([]);
   const [students, setStudents] = useState([]);
   const [solicitations, setSolicitations] = useState([]);
   const [rotas, setRotas] = useState([]);
@@ -36,13 +38,16 @@ export default function Admin() {
   const [loadingRotas, setLoadingRotas] = useState(false);
   const [loadingPontos, setLoadingPontos] = useState(false);
   const [search, setSearch] = useState("");
-  const [activeSection, setActiveSection] = useState("veiculos");
+  const [activeSection, setActiveSection] = useState("rotas");
   const [studentsStep, setStudentsStep] = useState(0); // 0 = Alunos vinculados, 1 = Solicitações
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isTokenDialogOpen, setIsTokenDialogOpen] = useState(false);
-  const [editingVehicle, setEditingVehicle] = useState(null);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
-  const [vehicleToDelete, setVehicleToDelete] = useState(null);
+  const [isCreatePointDialogOpen, setIsCreatePointDialogOpen] = useState(false);
+  const [isCreateRouteDialogOpen, setIsCreateRouteDialogOpen] = useState(false);
+  const [editingRoute, setEditingRoute] = useState(null);
+  const [editingPoint, setEditingPoint] = useState(null);
+  const [isManageRoutePointsOpen, setIsManageRoutePointsOpen] = useState(false);
+  const [selectedRoute, setSelectedRoute] = useState(null);
   const [studentToRemove, setStudentToRemove] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
@@ -82,15 +87,9 @@ export default function Admin() {
       const token = localStorage.getItem("token");
       fetchRotas(empresa.idEmpresa, token);
       fetchPontos(empresa.idEmpresa, token);
-    }
-  };
-
-  const handleVehicleCreated = () => {
-    const token = localStorage.getItem("token");
-    const decodedToken = decodeToken(token);
-
-    if (decodedToken && decodedToken.idEmpresa) {
-      fetchVehicles(decodedToken.idEmpresa, token);
+    } else if (section === "pontos" && empresa?.idEmpresa) {
+      const token = localStorage.getItem("token");
+      fetchPontos(empresa.idEmpresa, token);
     }
   };
 
@@ -102,16 +101,6 @@ export default function Admin() {
       fetchStudents(decodedToken.idEmpresa, token);
       fetchSolicitations(decodedToken.idEmpresa, token);
     }
-  };
-
-  const handleEditVehicle = (vehicle) => {
-    setEditingVehicle(vehicle);
-    setIsDialogOpen(true);
-  };
-
-  const handleDeleteVehicle = (vehicleId) => {
-    setVehicleToDelete(vehicleId);
-    setIsConfirmDialogOpen(true);
   };
 
   const handleRemoveStudent = (studentId, reactivate = false) => {
@@ -178,24 +167,6 @@ export default function Admin() {
   };
 
   const confirmDeleteVehicle = async () => {
-    if (vehicleToDelete) {
-      setIsDeleting(true);
-      try {
-        const token = localStorage.getItem("token");
-        await api.delete(`/veiculo/${vehicleToDelete}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        handleVehicleCreated();
-      } catch (error) {
-        console.error("Erro ao deletar veículo:", error);
-      } finally {
-        setIsDeleting(false);
-        setVehicleToDelete(null);
-      }
-    }
-
     if (studentToRemove) {
       setIsDeleting(true);
       try {
@@ -236,34 +207,6 @@ export default function Admin() {
         setIsDeleting(false);
         setStudentToRemove(null);
       }
-    }
-  };
-
-  const fetchVehicles = async (idEmpresa, token) => {
-    setLoading(true);
-    try {
-      const response = await api.get(`/empresa/${idEmpresa}/veiculos`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.data && response.data.data) {
-        setVehicles(
-          Array.isArray(response.data.data) ? response.data.data : []
-        );
-      } else {
-        setVehicles([]);
-      }
-    } catch (error) {
-      console.error("Erro ao buscar veículos:", error);
-      if (error.response?.status === 401) {
-        localStorage.removeItem("token");
-        router.push("/login");
-      }
-      setVehicles([]);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -378,12 +321,71 @@ export default function Admin() {
     }
   };
 
-  const filteredVehicles = vehicles.filter(
-    (item) =>
-      item.descricao?.toLowerCase().includes(search.toLowerCase()) ||
-      item.modelo?.toLowerCase().includes(search.toLowerCase()) ||
-      item.placa?.toLowerCase().includes(search.toLowerCase())
-  );
+  const handlePointCreated = () => {
+    const token = localStorage.getItem("token");
+    if (empresa?.idEmpresa) {
+      fetchPontos(empresa.idEmpresa, token);
+    }
+  };
+
+  const handleRouteCreated = () => {
+    const token = localStorage.getItem("token");
+    if (empresa?.idEmpresa) {
+      fetchRotas(empresa.idEmpresa, token);
+    }
+  };
+
+  const handleEditRoute = (route) => {
+    setEditingRoute(route);
+    setIsCreateRouteDialogOpen(true);
+  };
+
+  const handleEditPoint = (point) => {
+    setEditingPoint(point);
+    setIsCreatePointDialogOpen(true);
+  };
+
+  const handleManageRoutePoints = (route) => {
+    setSelectedRoute(route);
+    setIsManageRoutePointsOpen(true);
+  };
+
+  const handleDeletePoint = async (point) => {
+    try {
+      const authToken = localStorage.getItem("token");
+      await api.delete(`/ponto/${point.id}`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      toaster.create({
+        title: "Ponto excluído com sucesso!",
+        status: "success",
+      });
+
+      // Refresh da lista de pontos
+      const decodedToken = decodeToken(authToken);
+      if (decodedToken?.idEmpresa) {
+        fetchPontos(decodedToken.idEmpresa, authToken);
+      }
+    } catch (error) {
+      console.error("Erro ao excluir ponto:", error);
+      toaster.create({
+        title: error.response?.data?.message || "Erro ao excluir ponto",
+        status: "error",
+      });
+    }
+  };
+
+  const closeDialogs = () => {
+    setEditingRoute(null);
+    setEditingPoint(null);
+    setSelectedRoute(null);
+    setIsCreateRouteDialogOpen(false);
+    setIsCreatePointDialogOpen(false);
+    setIsManageRoutePointsOpen(false);
+  };
 
   const filteredStudents = students.filter(
     (item) =>
@@ -403,54 +405,6 @@ export default function Admin() {
 
   const renderContent = () => {
     switch (activeSection) {
-      case "veiculos":
-        return (
-          <Box>
-            <Flex justifyContent="space-between" alignItems="center" mb={2}>
-              <Text
-                fontSize="2xl"
-                fontWeight="bold"
-                color="#334155"
-                fontFamily="Montserrat"
-              >
-                Lista de Veículos
-              </Text>
-            </Flex>
-            <Flex
-              display="flex"
-              alignItems="center"
-              justifyContent="space-between"
-              mb={2}
-            >
-              <InputPesquisa
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Pesquisar veículo..."
-              />
-              <Button
-                bg="#fdb525"
-                color="white"
-                fontFamily="Montserrat"
-                fontWeight="bold"
-                ml={2}
-                _hover={{
-                  bg: "#f59e0b",
-                  transform: "scale(1.02)",
-                  transition: "0.3s",
-                }}
-                onClick={() => setIsDialogOpen(true)}
-              >
-                + Adicionar Veículo
-              </Button>
-            </Flex>
-            <TabelaVeiculos
-              vehicles={filteredVehicles}
-              loading={loading}
-              onEdit={handleEditVehicle}
-              onDelete={handleDeleteVehicle}
-            />
-          </Box>
-        );
       case "alunos":
         return (
           <Box>
@@ -604,15 +558,7 @@ export default function Admin() {
                     transform: "scale(1.02)",
                     transition: "0.3s",
                   }}
-                  onClick={() => {
-                    // TODO: Implementar dialog criar ponto
-                    toaster.create({
-                      title: "Funcionalidade em desenvolvimento",
-                      description:
-                        "Dialog para criar ponto será implementado em breve",
-                      type: "info",
-                    });
-                  }}
+                  onClick={() => setIsCreatePointDialogOpen(true)}
                 >
                   + Criar Ponto
                 </Button>
@@ -629,15 +575,7 @@ export default function Admin() {
                     transform: "scale(1.02)",
                     transition: "0.3s",
                   }}
-                  onClick={() => {
-                    // TODO: Implementar dialog criar rota
-                    toaster.create({
-                      title: "Funcionalidade em desenvolvimento",
-                      description:
-                        "Dialog para criar rota será implementado em breve",
-                      type: "info",
-                    });
-                  }}
+                  onClick={() => setIsCreateRouteDialogOpen(true)}
                 >
                   + Criar Rota
                 </Button>
@@ -735,15 +673,7 @@ export default function Admin() {
                           display="flex"
                           alignItems="center"
                           justifyContent="center"
-                          onClick={() => {
-                            // TODO: Implementar edição de rota
-                            toaster.create({
-                              title: "Funcionalidade em desenvolvimento",
-                              description:
-                                "Edição de rota será implementada em breve",
-                              type: "info",
-                            });
-                          }}
+                          onClick={() => handleEditRoute(rota)}
                         >
                           <FiEdit2 size={18} />
                         </Button>
@@ -756,15 +686,7 @@ export default function Admin() {
                           display="flex"
                           alignItems="center"
                           justifyContent="center"
-                          onClick={() => {
-                            // TODO: Implementar gestão de pontos da rota
-                            toaster.create({
-                              title: "Funcionalidade em desenvolvimento",
-                              description:
-                                "Gestão de pontos da rota será implementada em breve",
-                              type: "info",
-                            });
-                          }}
+                          onClick={() => handleManageRoutePoints(rota)}
                         >
                           <FaMapMarkedAlt size={18} />
                         </Button>
@@ -772,6 +694,134 @@ export default function Admin() {
                     </Flex>
                   </Box>
                 ))}
+              </Box>
+            )}
+          </Box>
+        );
+      case "pontos":
+        return (
+          <Box>
+            <Flex justifyContent="space-between" alignItems="center" mb={6}>
+              <Text
+                fontSize="2xl"
+                fontWeight="bold"
+                color="#334155"
+                fontFamily="Montserrat"
+              >
+                Gestão de Pontos
+              </Text>
+              <Button
+                bg="#fdb525"
+                color="white"
+                fontFamily="Montserrat"
+                fontWeight="bold"
+                borderRadius="md"
+                px={4}
+                py={2}
+                _hover={{
+                  bg: "#f59e0b",
+                  transform: "scale(1.02)",
+                  transition: "0.3s",
+                }}
+                onClick={() => setIsCreatePointDialogOpen(true)}
+              >
+                + Criar Ponto
+              </Button>
+            </Flex>
+
+            {loadingPontos ? (
+              <Box textAlign="center" py={8}>
+                <Text fontFamily="Montserrat" color="gray.500">
+                  Carregando pontos...
+                </Text>
+              </Box>
+            ) : pontos.length === 0 ? (
+              <Box textAlign="center" py={12}>
+                <Text fontFamily="Montserrat" fontSize="lg" color="gray.400">
+                  Nenhum ponto encontrado
+                </Text>
+                <Text fontFamily="Montserrat" color="gray.500" mt={2}>
+                  Crie seu primeiro ponto para começar
+                </Text>
+              </Box>
+            ) : (
+              <Box>
+                <VStack spacing={4} align="stretch">
+                  {pontos.map((ponto) => (
+                    <Box
+                      key={ponto.id}
+                      bg="white"
+                      p={6}
+                      borderRadius="lg"
+                      boxShadow="0 2px 8px rgba(0,0,0,0.1)"
+                      border="1px solid #e2e8f0"
+                    >
+                      <Flex
+                        justifyContent="space-between"
+                        alignItems="flex-start"
+                      >
+                        <Box flex={1}>
+                          <Text
+                            fontSize="lg"
+                            fontWeight="bold"
+                            color="#1e293b"
+                            fontFamily="Montserrat"
+                            mb={2}
+                          >
+                            {ponto.nome}
+                          </Text>
+                          {ponto.endereco && (
+                            <Text
+                              fontSize="sm"
+                              color="#64748b"
+                              fontFamily="Montserrat"
+                              mb={2}
+                            >
+                              {ponto.endereco}
+                            </Text>
+                          )}
+                          {ponto.latitude && ponto.longitude && (
+                            <Text
+                              fontSize="xs"
+                              color="#94a3b8"
+                              fontFamily="Montserrat"
+                            >
+                              Coordenadas: {ponto.latitude}, {ponto.longitude}
+                            </Text>
+                          )}
+                        </Box>
+                        <HStack spacing={2}>
+                          <Button
+                            size="md"
+                            bg="transparent"
+                            color="#64748B"
+                            _hover={{ color: "#3B82F6", bg: "#F1F5F9" }}
+                            p={3}
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            onClick={() => handleEditPoint(ponto)}
+                          >
+                            <FiEdit2 size={18} />
+                          </Button>
+                          <Button
+                            size="md"
+                            bg="transparent"
+                            color="#ef4444"
+                            _hover={{ color: "#dc2626", bg: "#fef2f2" }}
+                            p={3}
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            onClick={() => handleDeletePoint(ponto)}
+                          >
+                            <Text fontSize="18px">🗑️</Text>
+                          </Button>
+                        </HStack>
+                      </Flex>
+                    </Box>
+                  ))}
+                </VStack>
               </Box>
             )}
           </Box>
@@ -814,10 +864,12 @@ export default function Admin() {
 
     setEmpresa(decodedToken);
 
-    fetchVehicles(decodedToken.idEmpresa, token);
     if (activeSection === "alunos") {
       fetchStudents(decodedToken.idEmpresa, token);
       fetchSolicitations(decodedToken.idEmpresa, token);
+    } else if (activeSection === "rotas") {
+      fetchRotas(decodedToken.idEmpresa, token);
+      fetchPontos(decodedToken.idEmpresa, token);
     }
   }, [router, activeSection]);
 
@@ -885,26 +937,6 @@ export default function Admin() {
         >
           <VStack spacing={1} align="stretch" p={4}>
             <Button
-              bg={activeSection === "veiculos" ? "#fdb525" : "transparent"}
-              color="white"
-              fontFamily="Montserrat"
-              fontWeight="500"
-              justifyContent="flex-start"
-              borderRadius="lg"
-              py={6}
-              px={4}
-              mb={1}
-              leftIcon={<Text fontSize="md">🚐</Text>}
-              _hover={{
-                bg: activeSection === "veiculos" ? "#fdb525" : "#475569",
-                transform: "scale(1.01)",
-                transition: "0.2s",
-              }}
-              onClick={() => handleSectionChange("veiculos")}
-            >
-              Veículos
-            </Button>
-            <Button
               bg={activeSection === "rotas" ? "#fdb525" : "transparent"}
               color="white"
               fontFamily="Montserrat"
@@ -923,6 +955,26 @@ export default function Admin() {
               onClick={() => handleSectionChange("rotas")}
             >
               Rotas
+            </Button>
+            <Button
+              bg={activeSection === "pontos" ? "#fdb525" : "transparent"}
+              color="white"
+              fontFamily="Montserrat"
+              fontWeight="500"
+              justifyContent="flex-start"
+              borderRadius="lg"
+              py={6}
+              px={4}
+              mb={1}
+              leftIcon={<Text fontSize="md">📍</Text>}
+              _hover={{
+                bg: activeSection === "pontos" ? "#fdb525" : "#475569",
+                transform: "scale(1.01)",
+                transition: "0.2s",
+              }}
+              onClick={() => handleSectionChange("pontos")}
+            >
+              Pontos
             </Button>
             <Button
               bg={activeSection === "alunos" ? "#fdb525" : "transparent"}
@@ -984,17 +1036,6 @@ export default function Admin() {
         </Box>
       </Flex>
 
-      <DialogCreateVehicle
-        isOpen={isDialogOpen}
-        onClose={() => {
-          setIsDialogOpen(false);
-          setEditingVehicle(null);
-        }}
-        onCreated={handleVehicleCreated}
-        editingVehicle={editingVehicle}
-        idEmpresa={empresa?.idEmpresa}
-      />
-
       <DialogGenerateToken
         isOpen={isTokenDialogOpen}
         onClose={() => setIsTokenDialogOpen(false)}
@@ -1006,26 +1047,37 @@ export default function Admin() {
         isOpen={isConfirmDialogOpen}
         onClose={() => {
           setIsConfirmDialogOpen(false);
-          setVehicleToDelete(null);
           setStudentToRemove(null);
         }}
         onConfirm={confirmDeleteVehicle}
         message={
-          vehicleToDelete
-            ? "Tem certeza que deseja excluir este veículo? Esta ação não pode ser desfeita."
-            : studentToRemove?.reactivate
+          studentToRemove?.reactivate
             ? "Tem certeza que deseja reativar este aluno?"
             : "Tem certeza que deseja desvincular este aluno?"
         }
-        confirmText={
-          vehicleToDelete
-            ? "Excluir"
-            : studentToRemove?.reactivate
-            ? "Reativar"
-            : "Desvincular"
-        }
+        confirmText={studentToRemove?.reactivate ? "Reativar" : "Desvincular"}
         cancelText="Cancelar"
         isLoading={isDeleting}
+      />
+
+      <DialogCreatePoint
+        isOpen={isCreatePointDialogOpen}
+        onClose={closeDialogs}
+        onCreated={handlePointCreated}
+        editingPoint={editingPoint}
+      />
+
+      <DialogCreateRoute
+        isOpen={isCreateRouteDialogOpen}
+        onClose={closeDialogs}
+        onCreated={handleRouteCreated}
+        editingRoute={editingRoute}
+      />
+
+      <DialogManageRoutePoints
+        isOpen={isManageRoutePointsOpen}
+        onClose={closeDialogs}
+        route={selectedRoute}
       />
     </Box>
   );
