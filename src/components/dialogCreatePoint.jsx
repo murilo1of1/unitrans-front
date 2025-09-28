@@ -53,7 +53,6 @@ export default function DialogCreatePoint({
     try {
       const authToken = localStorage.getItem("token");
 
-      // Decodificar o token para obter o idEmpresa
       const decodeToken = (token) => {
         try {
           const base64Url = token.split(".")[1];
@@ -211,7 +210,6 @@ export default function DialogCreatePoint({
                     <Input
                       fontFamily="Montserrat"
                       id="latitude"
-                      type="number"
                       step="any"
                       placeholder="-23.550520"
                       value={latitude}
@@ -235,7 +233,6 @@ export default function DialogCreatePoint({
                     <Input
                       fontFamily="Montserrat"
                       id="longitude"
-                      type="number"
                       step="any"
                       placeholder="-46.633309"
                       value={longitude}

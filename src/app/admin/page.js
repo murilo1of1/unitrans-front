@@ -23,6 +23,7 @@ import DialogCreatePoint from "@/components/dialogCreatePoint";
 import DialogCreateRoute from "@/components/dialogCreateRoute";
 import DialogManageRoutePoints from "@/components/dialogManageRoutePoints";
 import { toaster } from "@/components/ui/toaster";
+import { FaRegTrashAlt } from "react-icons/fa";
 import { FiEdit2 } from "react-icons/fi";
 import { FaMapMarkedAlt } from "react-icons/fa";
 
@@ -746,7 +747,7 @@ export default function Admin() {
               </Box>
             ) : (
               <Box>
-                <VStack spacing={4} align="stretch">
+                <VStack spacing={3} align="stretch">
                   {pontos.map((ponto) => (
                     <Box
                       key={ponto.id}
@@ -775,7 +776,6 @@ export default function Admin() {
                               fontSize="sm"
                               color="#64748b"
                               fontFamily="Montserrat"
-                              mb={2}
                             >
                               {ponto.endereco}
                             </Text>
@@ -807,7 +807,7 @@ export default function Admin() {
                           <Button
                             size="md"
                             bg="transparent"
-                            color="#ef4444"
+                            color="#64748B"
                             _hover={{ color: "#dc2626", bg: "#fef2f2" }}
                             p={3}
                             display="flex"
@@ -815,7 +815,7 @@ export default function Admin() {
                             justifyContent="center"
                             onClick={() => handleDeletePoint(ponto)}
                           >
-                            <Text fontSize="18px">🗑️</Text>
+                            <FaRegTrashAlt />
                           </Button>
                         </HStack>
                       </Flex>

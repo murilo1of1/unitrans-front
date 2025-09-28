@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import api from "@/utils/axios";
 import DialogAddCompany from "@/components/dialogAddCompany";
 import TableSolicitationsUser from "@/components/tableSolicitationsUser";
+import DialogRoutePointsUser from "@/components/dialogRoutePointsUser";
 
 export default function User() {
   const [companies, setCompanies] = useState([]);
@@ -16,6 +17,8 @@ export default function User() {
   const [loadingRotas, setLoadingRotas] = useState(false);
   const [activeSection, setActiveSection] = useState("rotas");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isRoutePointsDialogOpen, setIsRoutePointsDialogOpen] = useState(false);
+  const [selectedRoute, setSelectedRoute] = useState(null);
   const router = useRouter();
 
   const decodeToken = (token) => {
@@ -80,6 +83,16 @@ export default function User() {
       const studentId = decodedToken.idAluno || decodedToken.id;
       fetchCompanies(studentId, token);
     }
+  };
+
+  const handleViewRoutePoints = (route) => {
+    setSelectedRoute(route);
+    setIsRoutePointsDialogOpen(true);
+  };
+
+  const handleCloseRoutePointsDialog = () => {
+    setSelectedRoute(null);
+    setIsRoutePointsDialogOpen(false);
   };
 
   const fetchCompanies = async (idAluno, token) => {
@@ -295,6 +308,7 @@ export default function User() {
                           bg: "#f59e0b",
                           transform: "scale(1.02)",
                         }}
+                        onClick={() => handleViewRoutePoints(rota)}
                       >
                         Ver Pontos
                       </Button>
@@ -642,6 +656,12 @@ export default function User() {
         onClose={() => setIsDialogOpen(false)}
         onCompanyAdded={handleCompanyAdded}
         idAluno={aluno?.idAluno || aluno?.id}
+      />
+
+      <DialogRoutePointsUser
+        isOpen={isRoutePointsDialogOpen}
+        onClose={handleCloseRoutePointsDialog}
+        route={selectedRoute}
       />
     </Box>
   );
