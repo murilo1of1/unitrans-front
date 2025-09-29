@@ -38,7 +38,7 @@ export default function LoginInput({ mandarDadosdofilho }) {
       >
         <Input
           variant="outline"
-          placeholder="Login"
+          placeholder="Email"
           fontFamily="Montserrat"
           _placeholder={{ color: "white" }}
           onChange={(e) => setEmail(e.target.value)}
