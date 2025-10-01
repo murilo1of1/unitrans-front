@@ -22,10 +22,12 @@ import DialogConfirmation from "@/components/dialogConfirmation";
 import DialogCreatePoint from "@/components/dialogCreatePoint";
 import DialogCreateRoute from "@/components/dialogCreateRoute";
 import DialogManageRoutePoints from "@/components/dialogManageRoutePoints";
+import DialogPassengerList from "@/components/dialogPassengerList";
 import { toaster } from "@/components/ui/toaster";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { FiEdit2 } from "react-icons/fi";
 import { FaMapMarkedAlt } from "react-icons/fa";
+import { FaUsers } from "react-icons/fa";
 
 export default function Admin() {
   const [students, setStudents] = useState([]);
@@ -51,6 +53,9 @@ export default function Admin() {
   const [selectedRoute, setSelectedRoute] = useState(null);
   const [studentToRemove, setStudentToRemove] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isPassengerDialogOpen, setIsPassengerDialogOpen] = useState(false);
+  const [selectedRouteForPassengers, setSelectedRouteForPassengers] =
+    useState(null);
   const router = useRouter();
 
   const decodeToken = (token) => {
@@ -349,6 +354,11 @@ export default function Admin() {
   const handleManageRoutePoints = (route) => {
     setSelectedRoute(route);
     setIsManageRoutePointsOpen(true);
+  };
+
+  const handleViewPassengers = (route) => {
+    setSelectedRouteForPassengers(route);
+    setIsPassengerDialogOpen(true);
   };
 
   const handleDeletePoint = async (point) => {
@@ -690,6 +700,19 @@ export default function Admin() {
                           onClick={() => handleManageRoutePoints(rota)}
                         >
                           <FaMapMarkedAlt size={18} />
+                        </Button>
+                        <Button
+                          size="md"
+                          bg="transparent"
+                          color="#64748B"
+                          _hover={{ color: "#fdb525", bg: "#FEF3E2" }}
+                          p={3}
+                          display="flex"
+                          alignItems="center"
+                          justifyContent="center"
+                          onClick={() => handleViewPassengers(rota)}
+                        >
+                          <FaUsers size={18} />
                         </Button>
                       </HStack>
                     </Flex>
@@ -1078,6 +1101,12 @@ export default function Admin() {
         isOpen={isManageRoutePointsOpen}
         onClose={closeDialogs}
         route={selectedRoute}
+      />
+
+      <DialogPassengerList
+        isOpen={isPassengerDialogOpen}
+        onClose={() => setIsPassengerDialogOpen(false)}
+        route={selectedRouteForPassengers}
       />
     </Box>
   );

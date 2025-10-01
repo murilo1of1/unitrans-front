@@ -94,16 +94,83 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
   };
 
   const handleConfirm = async () => {
-    // Aqui você pode implementar a lógica para salvar as escolhas do aluno
-    // Por exemplo, salvar no backend as preferências de embarque e desembarque
+    if (!selectedEmbarque || !selectedDesembarque) {
+      toaster.create({
+        title: "Erro",
+        description: "Por favor, selecione pontos de embarque e desembarque.",
+        status: "error",
+      });
+      return;
+    }
 
-    toaster.create({
-      title: "Preferências salvas!",
-      description: "Suas escolhas de embarque e desembarque foram registradas.",
-      status: "success",
-    });
+    setIsLoading(true);
 
-    onClose();
+    try {
+      // Buscar dados do aluno do localStorage/token
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Token não encontrado");
+      }
+
+      // Decodificar token para pegar ID do aluno
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map(function (c) {
+            return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+          })
+          .join("")
+      );
+      const decodedToken = JSON.parse(jsonPayload);
+
+      console.log("Token decodificado completo:", decodedToken);
+
+      // Usar o campo correto do token
+      const alunoId = decodedToken.idAluno;
+
+      console.log("ID do aluno encontrado:", alunoId);
+
+      if (!alunoId) {
+        throw new Error("ID do aluno não encontrado no token");
+      }
+
+      const dadosEnvio = {
+        idAluno: alunoId,
+        idRota: route.id,
+        pontoEmbarque: selectedEmbarque,
+        pontoDesembarque: selectedDesembarque,
+      };
+
+      console.log("Dados que serão enviados:", dadosEnvio);
+
+      // Chamar endpoint para salvar escolhas
+      await api.post("/aluno/escolher-pontos", dadosEnvio, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      toaster.create({
+        title: "Preferências salvas!",
+        description:
+          "Suas escolhas de embarque e desembarque foram registradas.",
+        status: "success",
+      });
+
+      onClose();
+    } catch (error) {
+      console.error("Erro ao salvar escolhas:", error);
+      toaster.create({
+        title: "Erro ao salvar",
+        description:
+          error.response?.data?.message || "Erro interno do servidor",
+        status: "error",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const currentStepData = steps[currentStep];
@@ -166,20 +233,24 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
             key={rotaPonto.id}
             w="full"
             p={3}
-            bg={selectedValue === rotaPonto.id.toString() ? "#fef3c7" : "white"}
+            bg={
+              selectedValue === rotaPonto.ponto.id.toString()
+                ? "#fef3c7"
+                : "white"
+            }
             _hover={{
               bg:
-                selectedValue === rotaPonto.id.toString()
+                selectedValue === rotaPonto.ponto.id.toString()
                   ? "#fef3c7"
                   : "#f1f5f9",
             }}
             cursor="pointer"
-            onClick={() => onChange(rotaPonto.id.toString())}
+            onClick={() => onChange(rotaPonto.ponto.id.toString())}
             borderBottom="1px solid"
             borderColor="gray.100"
             borderLeft="2px solid"
             borderLeftColor={
-              selectedValue === rotaPonto.id.toString()
+              selectedValue === rotaPonto.ponto.id.toString()
                 ? "#fdb525"
                 : "transparent"
             }
@@ -192,19 +263,19 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
                 borderRadius="full"
                 border="2px solid"
                 borderColor={
-                  selectedValue === rotaPonto.id.toString()
+                  selectedValue === rotaPonto.ponto.id.toString()
                     ? "#fdb525"
                     : "#d1d5db"
                 }
                 bg={
-                  selectedValue === rotaPonto.id.toString()
+                  selectedValue === rotaPonto.ponto.id.toString()
                     ? "#fdb525"
                     : "white"
                 }
                 position="relative"
                 mx="auto"
               >
-                {selectedValue === rotaPonto.id.toString() && (
+                {selectedValue === rotaPonto.ponto.id.toString() && (
                   <Box
                     w={2}
                     h={2}
@@ -446,7 +517,8 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
                       fontFamily="Montserrat"
                       fontWeight="bold"
                       onClick={handleConfirm}
-                      isDisabled={!selectedDesembarque}
+                      isDisabled={!selectedDesembarque || isLoading}
+                      isLoading={isLoading}
                       _hover={{
                         bg: "#f59e0b",
                         transform: "scale(1.02)",
