@@ -12,16 +12,16 @@ export default function Register() {
 
   const registerUsuario = async (content, userType) => {
     try {
-      const endpoint = userType === "aluno" ? "/aluno" : "/empresa";
+      const endpoint = userType === "aluno" ? "/alunos" : "/empresas";
       const response = await axios.post(endpoint, { ...content });
-      
+
       if (response.status == 200 || response.status === 201) {
         const userTypeLabel = userType === "aluno" ? "Aluno" : "Empresa";
         toaster.create({
           description: `${userTypeLabel} criado com sucesso! Redirecionando para o login...`,
           type: "success",
         });
-        
+
         setTimeout(() => {
           router.push("/login");
         }, 1500);

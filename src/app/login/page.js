@@ -9,20 +9,21 @@ import { jwtDecode } from "jwt-decode";
 
 export default function LoginPc() {
   const router = useRouter();
- 
+
   const loginUsuario = async (content) => {
     try {
-      const response = await api.post(`/aluno/login`, { ...content });
-      if (response.status == 200) {
+      const response = await api.post(`/auth/login`, { ...content });
+      if (response.status == 200 || response.status == 201) {
         const token = response.data.response;
         localStorage.setItem("token", token);
         console.log("Token de aluno salvo:", localStorage.getItem("token"));
-        
+
         toaster.create({
-          description: "Login de aluno realizado com sucesso! Redirecionando...",
+          description:
+            "Login de aluno realizado com sucesso! Redirecionando...",
           type: "success",
         });
-        
+
         setTimeout(() => {
           router.push("/user");
         }, 1500);
@@ -33,17 +34,18 @@ export default function LoginPc() {
     }
 
     try {
-      const response = await api.post(`/empresa/login`, { ...content });
-      if (response.status == 200) {
+      const response = await api.post(`/auth/login-empresa`, { ...content });
+      if (response.status == 200 || response.status == 201) {
         const token = response.data.response;
         localStorage.setItem("token", token);
         console.log("Token de empresa salvo:", localStorage.getItem("token"));
-        
+
         toaster.create({
-          description: "Login de empresa realizado com sucesso! Redirecionando...",
+          description:
+            "Login de empresa realizado com sucesso! Redirecionando...",
           type: "success",
         });
-        
+
         setTimeout(() => {
           router.push("/admin");
         }, 1500);

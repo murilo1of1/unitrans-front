@@ -24,46 +24,18 @@ export default function DialogForgotPassword({ isOpen, onClose }) {
   const sendEmail = async () => {
     setIsLoading(true);
     try {
-      let alunoSuccess = false;
-      let empresaSuccess = false;
+      const response = await axios.post("/auth/forgot-password", { email });
+      console.log("Resposta do endpoint:", response.data);
 
-      try {
-        const response = await axios.post("/aluno/forgot-password", { email });
-        console.log("Resposta do endpoint aluno:", response.data);
-        if (response.status === 200) {
-          alunoSuccess = true;
-        }
-      } catch (error) {
-        console.log("Erro no endpoint aluno:", error.response?.status);
-      }
-
-      try {
-        const response = await axios.post("/empresa/forgot-password", {
-          email,
-        });
-        console.log("Resposta do endpoint empresa:", response.data);
-        if (response.status === 200) {
-          empresaSuccess = true;
-        }
-      } catch (error) {
-        console.log("Erro no endpoint empresa:", error.response?.status);
-      }
-
-      if (alunoSuccess || empresaSuccess) {
-        setUserType("aluno");
+      if (response.status === 200 || response.status === 201) {
         setStep(2);
         toaster.create({
           title: "Se o e-mail existir em nosso sistema, o código foi enviado!",
           type: "success",
         });
-      } else {
-        toaster.create({
-          title: "Erro de conexão. Tente novamente.",
-          type: "error",
-        });
       }
     } catch (error) {
-      console.error("Erro geral:", error);
+      console.error("Erro ao enviar email:", error);
       toaster.create({
         title: "Erro ao processar solicitação!",
         type: "error",
@@ -76,59 +48,30 @@ export default function DialogForgotPassword({ isOpen, onClose }) {
   const resetPassword = async () => {
     setIsLoading(true);
     try {
-      let resetSuccess = false;
+      const response = await axios.post("/auth/reset-password", {
+        token,
+        newPassword,
+      });
 
-      try {
-        const response = await axios.post("/aluno/reset-password", {
-          token,
-          newPassword,
+      if (response.status === 200 || response.status === 201) {
+        toaster.create({
+          title: "Senha alterada com sucesso!",
+          type: "success",
         });
 
-        if (response.status === 200) {
-          resetSuccess = true;
-          toaster.create({
-            title: "Senha alterada com sucesso!",
-            type: "success",
-          });
-        }
-      } catch (error) {
-        console.log("Reset como aluno falhou, tentando como empresa...");
-
-        try {
-          const response = await axios.post("/empresa/reset-password", {
-            token,
-            newPassword,
-          });
-
-          if (response.status === 200) {
-            resetSuccess = true;
-            toaster.create({
-              title: "Senha alterada com sucesso!",
-              type: "success",
-            });
-          }
-        } catch (empresaError) {
-          console.log("Reset como empresa também falhou");
-        }
-      }
-
-      if (resetSuccess) {
         setStep(1);
         setEmail("");
         setToken("");
         setNewPassword("");
         setUserType("");
         onClose();
-      } else {
-        toaster.create({
-          title: "Código inválido ou expirado. Verifique e tente novamente.",
-          type: "error",
-        });
       }
     } catch (error) {
       console.error("Erro ao redefinir a senha:", error);
       toaster.create({
-        title: "Erro ao redefinir a senha. Tente novamente.",
+        title:
+          error.response?.data?.message ||
+          "Código inválido ou expirado. Verifique e tente novamente.",
         type: "error",
       });
     } finally {
