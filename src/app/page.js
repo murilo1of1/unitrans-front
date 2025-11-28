@@ -148,7 +148,7 @@ export default function HomePage() {
             minW="40px"
             px={2}
             display={{ base: 'flex', md: 'none' }}
-            onClick={{
+            _hover={{
               bg: "#fdb525",
               color: "#342151",
             }}
