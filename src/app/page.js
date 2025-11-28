@@ -87,7 +87,9 @@ export default function HomePage() {
           >
             <CiUser />
             Criar Conta
-          </IconButton>
+          </IconButton>  
+            
+          {/* Botão Desktop */}
           <IconButton
             fontFamily="Montserrat"
             fontWeight="bold"
@@ -98,6 +100,7 @@ export default function HomePage() {
             borderRadius="md"
             px={5}
             mr="20px"
+            display={{ base: "none", md: "flex" }}
             _hover={{
               bg: "#fdb525",
               color: "#342151",
@@ -109,6 +112,23 @@ export default function HomePage() {
           >
             <CiLogin />
             Entrar
+          </IconButton>
+
+          {/* Botão Mobile */}
+          <IconButton
+            bg="transparent"
+            color="#342151"
+            size="sm"
+            minW="40px"
+            px={2}
+            display={{ base: "flex", md: "none" }}
+            _hover={{
+              bg: "#fdb525",
+              color: "#342151",
+            }}
+            onClick={() => router.push("/login")}
+          >
+            <CiLogin size={24} />
           </IconButton>
         </Flex>
       </Flex>
