@@ -1,6 +1,5 @@
 "use client";
-
-import { Box, Heading, VStack, Image } from "@chakra-ui/react";
+import { Box, Heading, VStack, Image, IconButton } from "@chakra-ui/react";
 import React, { useState } from "react";
 import RegisterInput from "@/components/registerInput";
 import { Toaster, toaster } from "@/components/ui/toaster";
@@ -58,20 +57,16 @@ export default function Register() {
       bgPosition="center"
       bgRepeat="no-repeat"
     >
-      <Box
-        w={{ base: "100%", md: "50%" }}
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-      >
+      <Box w="50%" display="flex" justifyContent="center" alignItems="center">
         <Box
-          h={{ base: "550px", md: "630px" }}
+          h="600px"
           bg="#282738"
           borderRadius={20}
           boxShadow="0 10px 30px rgba(0,0,0,0.3)"
-          p={{ base: 8, md: 10 }}
-          w={{ base: "90%", md: "630px" }}
-          maxW={{ base: "90%", md: "630px" }}
+          p={10}
+          minW="450px"
+          w="500px"
+          maxW="90%"
         >
           <VStack align="left" spacing={6}>
             <Image
@@ -83,7 +78,6 @@ export default function Register() {
               mb={-8}
               mt={-8}
             />
-
             <Heading
               fontFamily="Montserrat"
               color="white"
@@ -94,12 +88,10 @@ export default function Register() {
             >
               Preencha seus dados!
             </Heading>
-
             <RegisterInput mandarDadosdofilho={receberDadosdoFilho} />
           </VStack>
         </Box>
       </Box>
-
       <Toaster />
     </Box>
   );
