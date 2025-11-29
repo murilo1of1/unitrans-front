@@ -98,7 +98,7 @@ export default function User() {
   const fetchCompanies = async (idAluno, token) => {
     setLoading(true);
     try {
-      const response = await api.get(`/vinculo/aluno/${idAluno}?ativo=true`, {
+      const response = await api.get(`/vinculos/aluno/${idAluno}?ativo=true`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -126,7 +126,7 @@ export default function User() {
   const fetchSolicitations = async (idAluno, token) => {
     setLoadingSolicitations(true);
     try {
-      const response = await api.get(`/vinculo/solicitacao/aluno/${idAluno}`, {
+      const response = await api.get(`/vinculos/solicitacao/aluno/${idAluno}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -156,7 +156,7 @@ export default function User() {
     try {
       // Primeiro busca as empresas vinculadas ao aluno
       const empresasResponse = await api.get(
-        `/vinculo/aluno/${idAluno}?ativo=true`,
+        `/vinculos/aluno/${idAluno}?ativo=true`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -172,7 +172,7 @@ export default function User() {
         if (vinculo.empresa?.id) {
           try {
             const rotasResponse = await api.get(
-              `/empresa/${vinculo.empresa.id}/rotas`,
+              `/rotas/empresa/${vinculo.empresa.id}`,
               {
                 headers: {
                   Authorization: `Bearer ${token}`,

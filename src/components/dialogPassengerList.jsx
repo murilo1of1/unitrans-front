@@ -34,13 +34,13 @@ export default function DialogPassengerList({ isOpen, onClose, route }) {
     try {
       const authToken = localStorage.getItem("token");
       const response = await api.post(
-        "/rota/passageiros",
+        "/rotas/passageiros",
         {
           idRota: route.id,
         },
         {
           headers: {
-            Authorization: `Bearer ${authToken}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );

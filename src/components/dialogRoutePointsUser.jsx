@@ -54,9 +54,9 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
     setIsLoading(true);
     try {
       const authToken = localStorage.getItem("token");
-      const response = await api.get(`/rota/${route.id}/pontos`, {
+      const response = await api.get(`/rotas/${route.id}/pontos`, {
         headers: {
-          Authorization: `Bearer ${authToken}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -146,7 +146,7 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
       console.log("Dados que serão enviados:", dadosEnvio);
 
       // Chamar endpoint para salvar escolhas
-      await api.post("/aluno/escolher-pontos", dadosEnvio, {
+      await api.post("/alunos/escolher-pontos", dadosEnvio, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

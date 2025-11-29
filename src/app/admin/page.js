@@ -118,7 +118,7 @@ export default function Admin() {
     try {
       const token = localStorage.getItem("token");
       await api.patch(
-        `/vinculo/solicitacao/${solicitationId}/aprovar`,
+        `/vinculos/solicitacao/${solicitationId}/aprovar`,
         {},
         {
           headers: {
@@ -147,7 +147,7 @@ export default function Admin() {
     try {
       const token = localStorage.getItem("token");
       await api.patch(
-        `/vinculo/solicitacao/${solicitationId}/rejeitar`,
+        `/vinculos/solicitacao/${solicitationId}/rejeitar`,
         {},
         {
           headers: {
@@ -178,8 +178,8 @@ export default function Admin() {
       try {
         const token = localStorage.getItem("token");
         const endpoint = studentToRemove.reactivate
-          ? `/vinculo/${studentToRemove.id}/reativar`
-          : `/vinculo/${studentToRemove.id}/desativar`;
+          ? `/vinculos/${studentToRemove.id}/reativar`
+          : `/vinculos/${studentToRemove.id}/desativar`;
 
         await api.patch(
           endpoint,
@@ -219,7 +219,7 @@ export default function Admin() {
   const fetchStudents = async (idEmpresa, token) => {
     setLoadingStudents(true);
     try {
-      const response = await api.get(`/vinculo/empresa/${idEmpresa}`, {
+      const response = await api.get(`/vinculos/empresa/${idEmpresa}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -248,7 +248,7 @@ export default function Admin() {
     setLoadingSolicitations(true);
     try {
       const response = await api.get(
-        `/vinculo/solicitacao/empresa/${idEmpresa}`,
+        `/vinculos/solicitacao/empresa/${idEmpresa}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -278,7 +278,7 @@ export default function Admin() {
   const fetchRotas = async (idEmpresa, token) => {
     setLoadingRotas(true);
     try {
-      const response = await api.get(`/empresa/${idEmpresa}/rotas`, {
+      const response = await api.get(`/rotas/empresa/${idEmpresa}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -304,7 +304,7 @@ export default function Admin() {
   const fetchPontos = async (idEmpresa, token) => {
     setLoadingPontos(true);
     try {
-      const response = await api.get(`/empresa/${idEmpresa}/pontos`, {
+      const response = await api.get(`/pontos/empresa/${idEmpresa}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -364,7 +364,7 @@ export default function Admin() {
   const handleDeletePoint = async (point) => {
     try {
       const authToken = localStorage.getItem("token");
-      await api.delete(`/ponto/${point.id}`, {
+      await api.delete(`/pontos/${point.id}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },

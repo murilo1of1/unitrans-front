@@ -90,10 +90,10 @@ export default function DialogManageRoutePoints({ isOpen, onClose, route }) {
       if (!decodedToken?.idEmpresa) return;
 
       const response = await api.get(
-        `/empresa/${decodedToken.idEmpresa}/pontos`,
+        `/pontos/empresa/${decodedToken.idEmpresa}`,
         {
           headers: {
-            Authorization: `Bearer ${authToken}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -117,9 +117,9 @@ export default function DialogManageRoutePoints({ isOpen, onClose, route }) {
 
     try {
       const authToken = localStorage.getItem("token");
-      const response = await api.get(`/rota/${route.id}/pontos`, {
+      const response = await api.get(`/rotas/${route.id}/pontos`, {
         headers: {
-          Authorization: `Bearer ${authToken}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -201,10 +201,10 @@ export default function DialogManageRoutePoints({ isOpen, onClose, route }) {
     try {
       const authToken = localStorage.getItem("token");
       const response = await api.delete(
-        `/rota/${route.id}/pontos/${rotaPontoId}`,
+        `/rotas/${route.id}/pontos/${rotaPontoId}`,
         {
           headers: {
-            Authorization: `Bearer ${authToken}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -258,11 +258,11 @@ export default function DialogManageRoutePoints({ isOpen, onClose, route }) {
         await Promise.all(
           allUpdates.map((update) =>
             api.patch(
-              `/rota/${route.id}/pontos/${update.id}`,
+              `/rotas/${route.id}/pontos/${update.id}`,
               { ordem: update.ordem },
               {
                 headers: {
-                  Authorization: `Bearer ${authToken}`,
+                  Authorization: `Bearer ${token}`,
                 },
               }
             )
