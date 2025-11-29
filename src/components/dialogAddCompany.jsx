@@ -44,7 +44,7 @@ export default function DialogAddCompany({
     setIsLoadingCompanies(true);
     try {
       const authToken = localStorage.getItem("token");
-      const response = await api.get("/empresa", {
+      const response = await api.get("/empresas", {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -81,7 +81,7 @@ export default function DialogAddCompany({
     try {
       const authToken = localStorage.getItem("token");
       const response = await api.post(
-        "/vinculo/usar-token",
+        "/vinculos/usar-token",
         {
           token: token.trim(),
           alunoId: idAluno,
@@ -126,7 +126,7 @@ export default function DialogAddCompany({
     try {
       const authToken = localStorage.getItem("token");
       const response = await api.post(
-        "/vinculo/solicitacao",
+        "/vinculos/solicitacao",
         {
           alunoId: idAluno,
           empresaId: selectedCompany.id,

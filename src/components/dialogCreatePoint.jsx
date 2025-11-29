@@ -93,13 +93,13 @@ export default function DialogCreatePoint({
 
       let response;
       if (editingPoint) {
-        response = await api.patch(`/ponto/${editingPoint.id}`, pointData, {
+        response = await api.patch(`/pontos/${editingPoint.id}`, pointData, {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
         });
       } else {
-        response = await api.post("/ponto", pointData, {
+        response = await api.post("/pontos", pointData, {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },

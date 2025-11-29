@@ -33,7 +33,7 @@ export default function DialogGenerateToken({
     try {
       const token = localStorage.getItem("token");
       const response = await api.post(
-        "/vinculo/token",
+        "/vinculos/token",
         {
           empresaId: idEmpresa,
         },

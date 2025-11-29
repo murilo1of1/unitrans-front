@@ -105,15 +105,15 @@ export default function DialogCreateRoute({
 
       let response;
       if (editingRoute) {
-        response = await api.patch(`/rota/${editingRoute.id}`, routeData, {
+        response = await api.patch(`/rotas/${editingRoute.id}`, routeData, {
           headers: {
-            Authorization: `Bearer ${authToken}`,
+            Authorization: `Bearer ${token}`,
           },
         });
       } else {
-        response = await api.post("/rota", routeData, {
+        response = await api.post("/rotas", routeData, {
           headers: {
-            Authorization: `Bearer ${authToken}`,
+            Authorization: `Bearer ${token}`,
           },
         });
       }
