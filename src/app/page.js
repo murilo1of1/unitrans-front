@@ -22,7 +22,7 @@ export default function HomePage() {
       bgPosition="center"
       bgRepeat="no-repeat"
     >
-      {/* Header */}
+      {/* Header Responsivo */}
       <Flex
         as="header"
         w="100%"
@@ -36,6 +36,7 @@ export default function HomePage() {
         position="relative"
         zIndex={10}
       >
+        {/* Logo */}
         <Flex align="center" gap={2}>
           <Image
             src="/logo.png"
@@ -47,8 +48,9 @@ export default function HomePage() {
           />
         </Flex>
 
+        {/* Menu de Navegação */}
         <Flex align="center" gap={{ base: 1, md: 3 }}>
-          {/* Desktop only */}
+          {/* Como Funciona - Desktop only */}
           <IconButton
             fontFamily="Montserrat"
             fontWeight="bold"
@@ -76,6 +78,7 @@ export default function HomePage() {
             Como Funciona
           </IconButton>
 
+          {/* Criar Conta - Desktop */}
           <IconButton
             fontFamily="Montserrat"
             fontWeight="bold"
@@ -103,7 +106,7 @@ export default function HomePage() {
             Criar Conta
           </IconButton>
 
-          {/* Mobile */}
+          {/* Criar Conta - Mobile (apenas ícone) */}
           <IconButton
             bg="transparent"
             color="#342151"
@@ -120,6 +123,7 @@ export default function HomePage() {
             <CiUser size={24} />
           </IconButton>
 
+          {/* Entrar - Desktop */}
           <IconButton
             fontFamily="Montserrat"
             fontWeight="bold"
@@ -148,7 +152,7 @@ export default function HomePage() {
             Entrar
           </IconButton>
 
-          {/* Mobile */}
+          {/* Entrar - Mobile */}
           <IconButton
             bg="transparent"
             color="#342151"
@@ -167,7 +171,7 @@ export default function HomePage() {
         </Flex>
       </Flex>
 
-      {/* Conteúdo Principal */}
+      {/* Conteúdo Principal Responsivo */}
       <Flex
         w="100%"
         minH={{ base: "calc(100vh - 70px)", md: "calc(100vh - 100px)" }}
@@ -178,6 +182,7 @@ export default function HomePage() {
         flexDirection={{ base: "column", md: "row" }}
         gap={{ base: 6, md: 0 }}
       >
+        {/* Seção de Texto e CTA */}
         <VStack
           align={{ base: "center", md: "flex-start" }}
           spacing={{ base: 4, md: 6 }}
@@ -224,6 +229,7 @@ export default function HomePage() {
           </Button>
         </VStack>
 
+        {/* Mascote - Responsivo */}
         <Box
           display="flex"
           justifyContent={{ base: "center", md: "flex-end" }}

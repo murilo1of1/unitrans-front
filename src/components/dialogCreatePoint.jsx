@@ -21,21 +21,15 @@ export default function DialogCreatePoint({
 }) {
   const [nome, setNome] = useState("");
   const [endereco, setEndereco] = useState("");
-  const [latitude, setLatitude] = useState("");
-  const [longitude, setLongitude] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (isOpen && editingPoint) {
       setNome(editingPoint.nome || "");
       setEndereco(editingPoint.endereco || "");
-      setLatitude(editingPoint.latitude?.toString() || "");
-      setLongitude(editingPoint.longitude?.toString() || "");
     } else if (isOpen && !editingPoint) {
       setNome("");
       setEndereco("");
-      setLatitude("");
-      setLongitude("");
     }
     setIsLoading(false);
   }, [isOpen, editingPoint]);
@@ -86,8 +80,6 @@ export default function DialogCreatePoint({
       const pointData = {
         nome: nome.trim(),
         endereco: endereco.trim(),
-        latitude: latitude ? parseFloat(latitude) : null,
-        longitude: longitude ? parseFloat(longitude) : null,
         idEmpresa: decodedToken.idEmpresa,
       };
 
@@ -196,54 +188,6 @@ export default function DialogCreatePoint({
                   />
                 </Box>
 
-                <HStack spacing={4}>
-                  <Box flex={1}>
-                    <FormLabel
-                      fontFamily="Montserrat"
-                      color="#fdb525"
-                      fontWeight="500"
-                      mb={2}
-                      htmlFor="latitude"
-                    >
-                      Latitude
-                    </FormLabel>
-                    <Input
-                      fontFamily="Montserrat"
-                      id="latitude"
-                      step="any"
-                      placeholder="-23.550520"
-                      value={latitude}
-                      onChange={(e) => setLatitude(e.target.value)}
-                      bg="#3a3947"
-                      border="1px solid #4a4a5c"
-                      color="#fff"
-                      _placeholder={{ color: "#a0a0a0" }}
-                    />
-                  </Box>
-                  <Box flex={1}>
-                    <FormLabel
-                      fontFamily="Montserrat"
-                      color="#fdb525"
-                      fontWeight="500"
-                      mb={2}
-                      htmlFor="longitude"
-                    >
-                      Longitude
-                    </FormLabel>
-                    <Input
-                      fontFamily="Montserrat"
-                      id="longitude"
-                      step="any"
-                      placeholder="-46.633309"
-                      value={longitude}
-                      onChange={(e) => setLongitude(e.target.value)}
-                      bg="#3a3947"
-                      border="1px solid #4a4a5c"
-                      color="#fff"
-                      _placeholder={{ color: "#a0a0a0" }}
-                    />
-                  </Box>
-                </HStack>
                 <Button
                   mt={4}
                   bg="#fdb525"
