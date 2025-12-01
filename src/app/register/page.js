@@ -3,7 +3,7 @@
 import { Box, Heading, VStack, Image } from "@chakra-ui/react";
 import React, { useState } from "react";
 import RegisterInput from "@/components/registerInput";
-import { Toaster, toaster } from "@/components/ui/toaster";
+import { toaster } from "@/components/ui/toaster";
 import axios from "@/utils/axios";
 import { useRouter } from "next/navigation";
 
@@ -99,8 +99,6 @@ export default function Register() {
           </VStack>
         </Box>
       </Box>
-
-      <Toaster />
     </Box>
   );
 }

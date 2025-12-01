@@ -49,7 +49,7 @@ export default function DialogGenerateToken({
         setTokenData(response.data.data);
         toaster.create({
           title: "Token gerado com sucesso!",
-          status: "success",
+          type: "success",
         });
         if (onTokenGenerated) onTokenGenerated();
       }
@@ -58,7 +58,7 @@ export default function DialogGenerateToken({
         error.response?.data?.message || "Erro ao gerar token";
       toaster.create({
         title: errorMessage,
-        status: "error",
+        type: "error",
       });
     } finally {
       setIsLoading(false);

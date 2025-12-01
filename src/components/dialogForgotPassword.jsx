@@ -11,7 +11,7 @@ import {
 import { FormLabel } from "@chakra-ui/form-control";
 import axios from "@/utils/axios";
 import { useState } from "react";
-import { Toaster, toaster } from "@/components/ui/toaster";
+import { toaster } from "@/components/ui/toaster";
 
 export default function DialogForgotPassword({ isOpen, onClose }) {
   const [isLoading, setIsLoading] = useState(false);

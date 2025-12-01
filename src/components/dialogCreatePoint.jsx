@@ -9,7 +9,7 @@ import {
   HStack,
 } from "@chakra-ui/react";
 import { FormLabel } from "@chakra-ui/form-control";
-import { Toaster, toaster } from "@/components/ui/toaster";
+import { toaster } from "@/components/ui/toaster";
 import api from "@/utils/axios";
 import { useState, useEffect } from "react";
 
@@ -38,7 +38,7 @@ export default function DialogCreatePoint({
     if (!nome.trim()) {
       toaster.create({
         title: "Nome é obrigatório",
-        status: "error",
+        type: "error",
       });
       return;
     }
@@ -72,7 +72,7 @@ export default function DialogCreatePoint({
         toaster.create({
           title: "Erro de autenticação",
           description: "ID da empresa não encontrado. Faça login novamente.",
-          status: "error",
+          type: "error",
         });
         return;
       }
@@ -103,7 +103,7 @@ export default function DialogCreatePoint({
           title: editingPoint
             ? "Ponto atualizado com sucesso!"
             : "Ponto criado com sucesso!",
-          status: "success",
+          type: "success",
         });
         onCreated && onCreated();
         onClose();
@@ -112,7 +112,7 @@ export default function DialogCreatePoint({
       console.error("Erro ao salvar ponto:", error);
       toaster.create({
         title: error.response?.data?.message || "Erro ao salvar ponto",
-        status: "error",
+        type: "error",
       });
     } finally {
       setIsLoading(false);
@@ -219,7 +219,6 @@ export default function DialogCreatePoint({
           </Dialog.Content>
         </Dialog.Positioner>
       </Dialog.Root>
-      <Toaster />
     </Portal>
   );
 }

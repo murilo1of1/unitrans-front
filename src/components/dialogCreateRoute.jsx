@@ -8,7 +8,7 @@ import {
   Input,
 } from "@chakra-ui/react";
 import { FormLabel } from "@chakra-ui/form-control";
-import { Toaster, toaster } from "@/components/ui/toaster";
+import { toaster } from "@/components/ui/toaster";
 import api from "@/utils/axios";
 import { useState, useEffect } from "react";
 
@@ -40,7 +40,7 @@ export default function DialogCreateRoute({
     if (!nome.trim()) {
       toaster.create({
         title: "Nome da rota é obrigatório",
-        status: "error",
+        type: "error",
       });
       return;
     }
@@ -48,7 +48,7 @@ export default function DialogCreateRoute({
     if (!origem.trim()) {
       toaster.create({
         title: "Origem é obrigatória",
-        status: "error",
+        type: "error",
       });
       return;
     }
@@ -56,7 +56,7 @@ export default function DialogCreateRoute({
     if (!destino.trim()) {
       toaster.create({
         title: "Destino é obrigatório",
-        status: "error",
+        type: "error",
       });
       return;
     }
@@ -91,27 +91,33 @@ export default function DialogCreateRoute({
         toaster.create({
           title: "Erro de autenticação",
           description: "ID da empresa não encontrado. Faça login novamente.",
-          status: "error",
+          type: "error",
         });
         return;
       }
 
-      const routeData = {
-        nome: nome.trim(),
-        origem: origem.trim(),
-        destino: destino.trim(),
-        idEmpresa: decodedToken.idEmpresa,
-      };
-
       let response;
       if (editingRoute) {
-        response = await api.patch(`/rotas/${editingRoute.id}`, routeData, {
+        // PATCH não envia idEmpresa (não está no UpdateRotaDto)
+        const updateData = {
+          nome: nome.trim(),
+          origem: origem.trim(),
+          destino: destino.trim(),
+        };
+        response = await api.patch(`/rotas/${editingRoute.id}`, updateData, {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
         });
       } else {
-        response = await api.post("/rotas", routeData, {
+        // POST envia idEmpresa
+        const createData = {
+          nome: nome.trim(),
+          origem: origem.trim(),
+          destino: destino.trim(),
+          idEmpresa: decodedToken.idEmpresa,
+        };
+        response = await api.post("/rotas", createData, {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
@@ -123,7 +129,7 @@ export default function DialogCreateRoute({
           title: editingRoute
             ? "Rota atualizada com sucesso!"
             : "Rota criada com sucesso!",
-          status: "success",
+          type: "success",
         });
         onCreated && onCreated();
         onClose();
@@ -132,7 +138,7 @@ export default function DialogCreateRoute({
       console.error("Erro ao salvar rota:", error);
       toaster.create({
         title: error.response?.data?.message || "Erro ao salvar rota",
-        status: "error",
+        type: "error",
       });
     } finally {
       setIsLoading(false);
@@ -261,7 +267,6 @@ export default function DialogCreateRoute({
           </Dialog.Content>
         </Dialog.Positioner>
       </Dialog.Root>
-      <Toaster />
     </Portal>
   );
 }

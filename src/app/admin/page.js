@@ -129,7 +129,7 @@ export default function Admin() {
 
       toaster.create({
         title: "Solicitação aprovada com sucesso!",
-        status: "success",
+        type: "success",
       });
 
       handleStudentsRefresh();
@@ -138,7 +138,7 @@ export default function Admin() {
         error.response?.data?.message || "Erro ao aprovar solicitação";
       toaster.create({
         title: errorMessage,
-        status: "error",
+        type: "error",
       });
     }
   };
@@ -158,7 +158,7 @@ export default function Admin() {
 
       toaster.create({
         title: "Solicitação rejeitada",
-        status: "info",
+        type: "info",
       });
 
       handleStudentsRefresh();
@@ -167,7 +167,7 @@ export default function Admin() {
         error.response?.data?.message || "Erro ao rejeitar solicitação";
       toaster.create({
         title: errorMessage,
-        status: "error",
+        type: "error",
       });
     }
   };
@@ -195,7 +195,7 @@ export default function Admin() {
           title: studentToRemove.reactivate
             ? "Aluno reativado com sucesso!"
             : "Aluno desvinculado com sucesso!",
-          status: "success",
+          type: "success",
         });
 
         handleStudentsRefresh();
@@ -207,7 +207,7 @@ export default function Admin() {
           } aluno`;
         toaster.create({
           title: errorMessage,
-          status: "error",
+          type: "error",
         });
       } finally {
         setIsDeleting(false);
@@ -372,7 +372,7 @@ export default function Admin() {
 
       toaster.create({
         title: "Ponto excluído com sucesso!",
-        status: "success",
+        type: "success",
       });
 
       // Refresh da lista de pontos
@@ -384,7 +384,7 @@ export default function Admin() {
       console.error("Erro ao excluir ponto:", error);
       toaster.create({
         title: error.response?.data?.message || "Erro ao excluir ponto",
-        status: "error",
+        type: "error",
       });
     }
   };

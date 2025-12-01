@@ -5,7 +5,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { InputGroup } from "@/components/ui/input-group";
 import { FaUser, FaLock } from "react-icons/fa";
 import React, { useState } from "react";
-import { Toaster, toaster } from "@/components/ui/toaster";
+import { toaster } from "@/components/ui/toaster";
 import { useRouter } from "next/navigation";
 import DialogForgotPassword from "@/components/dialogForgotPassword";
 
@@ -31,7 +31,7 @@ export default function LoginInput({ mandarDadosdofilho }) {
       alignItems="center"
       spacing={3}
       w="100%"
-      maxW={{ base: "85%", md: "420px" }}  // Desktop original — mobile reduz
+      maxW={{ base: "85%", md: "420px" }} // Desktop original — mobile reduz
       mx="auto"
     >
       {/* EMAIL */}
@@ -44,8 +44,8 @@ export default function LoginInput({ mandarDadosdofilho }) {
           variant="outline"
           placeholder="Email"
           fontFamily="Montserrat"
-          fontSize={{ base: "14px", md: "16px" }}  // Mobile menor
-          h={{ base: "38px", md: "45px" }}         // Mobile menor
+          fontSize={{ base: "14px", md: "16px" }} // Mobile menor
+          h={{ base: "38px", md: "45px" }} // Mobile menor
           _placeholder={{ color: "white" }}
           onChange={(e) => setEmail(e.target.value)}
           borderColor="white"
@@ -136,8 +136,6 @@ export default function LoginInput({ mandarDadosdofilho }) {
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
       />
-
-      <Toaster />
     </Stack>
   );
 }
