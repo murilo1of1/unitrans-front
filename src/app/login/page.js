@@ -3,7 +3,7 @@ import { Box, Heading, VStack, Image } from "@chakra-ui/react";
 import React from "react";
 import api from "@/utils/axios";
 import LoginInput from "@/components/loginInput";
-import { Toaster, toaster } from "@/components/ui/toaster";
+import { toaster } from "@/components/ui/toaster";
 import { useRouter } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
 
@@ -110,7 +110,6 @@ export default function LoginPc() {
           <LoginInput mandarDadosdofilho={receberDadosdoFilho} />
         </VStack>
       </Box>
-      <Toaster />
     </Box>
   );
 }

@@ -9,7 +9,7 @@ import {
 import { PasswordInput } from "@/components/ui/password-input";
 import { InputGroup } from "@/components/ui/input-group";
 import React, { useState } from "react";
-import { Toaster, toaster } from "@/components/ui/toaster";
+import { toaster } from "@/components/ui/toaster";
 import { withMask } from "use-mask-input";
 
 export default function RegisterInput({ mandarDadosdofilho }) {
@@ -31,14 +31,20 @@ export default function RegisterInput({ mandarDadosdofilho }) {
 
   const getContent = () => {
     return userType === "aluno"
-      ? { nome, email, cpf: cpf.trim(), senha }
-      : { nome: nomeEmpresa, cnpj: cnpj.trim(), email: emailEmpresa, senha: senhaEmpresa };
+      ? { nome, email, cpf: cpf.replace(/\D/g, ""), senha }
+      : {
+          nome: nomeEmpresa,
+          cnpj: cnpj.replace(/\D/g, ""),
+          email: emailEmpresa,
+          senha: senhaEmpresa,
+        };
   };
 
   const validateAlunoForm = () => {
     if (!nome || !email || !cpf || !senha) {
       toaster.create({
-        title: "Preencha todos os campos obrigatórios (Nome, Email, CPF e Senha)!",
+        title:
+          "Preencha todos os campos obrigatórios (Nome, Email, CPF e Senha)!",
         type: "error",
       });
       return false;
@@ -49,7 +55,8 @@ export default function RegisterInput({ mandarDadosdofilho }) {
   const validateEmpresaForm = () => {
     if (!nomeEmpresa || !cnpj || !emailEmpresa || !senhaEmpresa) {
       toaster.create({
-        title: "Preencha todos os campos obrigatórios (Nome, CNPJ, Email e Senha)!",
+        title:
+          "Preencha todos os campos obrigatórios (Nome, CNPJ, Email e Senha)!",
         type: "error",
       });
       return false;
@@ -60,7 +67,8 @@ export default function RegisterInput({ mandarDadosdofilho }) {
   const mandarDados = async () => {
     if (isSubmitting) return;
     setIsSubmitting(true);
-    const isValid = userType === "aluno" ? validateAlunoForm() : validateEmpresaForm();
+    const isValid =
+      userType === "aluno" ? validateAlunoForm() : validateEmpresaForm();
     if (!isValid) {
       setIsSubmitting(false);
       return;
@@ -73,19 +81,15 @@ export default function RegisterInput({ mandarDadosdofilho }) {
     <Stack
       data-testid="register-input-stack"
       w="100%"
-
       /* 🔥 ALTERAÇÕES PEDIDAS 🔥 */
 
       // diminuir a caixa cinza
       maxW={{ base: "100%", md: "500px" }}
-
       // diminuir espaço interno superior e inferior do mobile
       pt={{ base: "28px", md: 0 }}
       pb={{ base: 1, md: 0 }}
-
       // mover tudo mais pra cima
       mt={{ base: "-28px", md: 0 }}
-   
       /* resto intacto */
       spacing={{ base: 2.5, md: 3 }}
       px={{ base: 2, md: 0 }}
@@ -259,8 +263,6 @@ export default function RegisterInput({ mandarDadosdofilho }) {
       >
         {userType === "aluno" ? "Cadastrar Aluno" : "Cadastrar Empresa"}
       </IconButton>
-
-      <Toaster />
     </Stack>
   );
 }

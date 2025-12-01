@@ -3,11 +3,9 @@
   --foreground: #171717;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Forçar tema light */
+html {
+  color-scheme: light !important;
 }
 
 html,
@@ -35,8 +33,91 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+/* Forçar cor branca nos inputs de login/register */
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  color: white !important;
+  -webkit-text-fill-color: white !important;
+}
+
+/* ========================================
+   ESTILOS PERSONALIZADOS DOS TOASTERS
+   ======================================== */
+
+/* Toast de Sucesso - Verde */
+[data-type="success"] {
+  background-color: #48bb78 !important;
+  border-left: 4px solid #38a169 !important;
+}
+
+[data-type="success"] * {
+  color: #ffffff !important;
+}
+
+/* Toast de Erro - Vermelho */
+[data-type="error"] {
+  background-color: #f56565 !important;
+  border-left: 4px solid #e53e3e !important;
+}
+
+[data-type="error"] * {
+  color: #ffffff !important;
+}
+
+/* Toast de Info - Azul */
+[data-type="info"] {
+  background-color: #4299e1 !important;
+  border-left: 4px solid #3182ce !important;
+}
+
+[data-type="info"] * {
+  color: #ffffff !important;
+}
+
+/* Toast de Warning - Amarelo */
+[data-type="warning"] {
+  background-color: #ed8936 !important;
+  border-left: 4px solid #dd6b20 !important;
+}
+
+[data-type="warning"] * {
+  color: #ffffff !important;
+}
+
+/* Toast de Loading - Roxo */
+[data-type="loading"] {
+  background-color: #805ad5 !important;
+  border-left: 4px solid #6b46c1 !important;
+}
+
+[data-type="loading"] * {
+  color: #ffffff !important;
+}
+
+/* Garantir que o indicador também tenha a cor correta */
+[data-type="success"] [data-scope="toast"][data-part="indicator"] {
+  background-color: #38a169 !important;
+}
+
+[data-type="error"] [data-scope="toast"][data-part="indicator"] {
+  background-color: #e53e3e !important;
+}
+
+[data-type="info"] [data-scope="toast"][data-part="indicator"] {
+  background-color: #3182ce !important;
+}
+
+[data-type="warning"] [data-scope="toast"][data-part="indicator"] {
+  background-color: #dd6b20 !important;
+}
+
+/* Botão de fechar */
+[data-scope="toast"][data-part="close-trigger"] {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+[data-scope="toast"][data-part="close-trigger"]:hover {
+  color: #ffffff !important;
+  background-color: rgba(0, 0, 0, 0.1) !important;
 }

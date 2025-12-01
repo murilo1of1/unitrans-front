@@ -10,28 +10,33 @@ import {
   createListCollection,
 } from "@chakra-ui/react";
 import { FormLabel } from "@chakra-ui/form-control";
-import { Toaster, toaster } from "@/components/ui/toaster"
+import { toaster } from "@/components/ui/toaster";
 import api from "@/utils/axios";
 import { useState, useEffect } from "react";
 
-export default function DialogCreateCupom({ isOpen, onClose, onCreated, editingCupom }) {
-  const [code, setCode] = useState('');
-  const [type, setType] = useState('');
-  const [value, setValue] = useState('');
-  const [uses, setUses] = useState('');
+export default function DialogCreateCupom({
+  isOpen,
+  onClose,
+  onCreated,
+  editingCupom,
+}) {
+  const [code, setCode] = useState("");
+  const [type, setType] = useState("");
+  const [value, setValue] = useState("");
+  const [uses, setUses] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (isOpen && editingCupom) {
-      setCode(editingCupom.code || '');
-      setType(editingCupom.type || '');
-      setValue(editingCupom.value || '');
-      setUses(editingCupom.uses || '');
+      setCode(editingCupom.code || "");
+      setType(editingCupom.type || "");
+      setValue(editingCupom.value || "");
+      setUses(editingCupom.uses || "");
     } else if (isOpen && !editingCupom) {
-      setCode('');
-      setType('');
-      setValue('');
-      setUses('');
+      setCode("");
+      setType("");
+      setValue("");
+      setUses("");
     }
     setIsLoading(false);
   }, [isOpen, editingCupom]);
@@ -41,7 +46,7 @@ export default function DialogCreateCupom({ isOpen, onClose, onCreated, editingC
       { label: "Valor", value: "valor" },
       { label: "Porcentagem", value: "porcentagem" },
     ],
-  })
+  });
 
   const handleSubmit = async () => {
     setIsLoading(true);
@@ -55,15 +60,20 @@ export default function DialogCreateCupom({ isOpen, onClose, onCreated, editingC
       let response;
       if (editingCupom) {
         response = await api.patch(`/cupom/${editingCupom.id}`, {
-          code, type, value, uses
+          code,
+          type,
+          value,
+          uses,
         });
       } else {
-        response = await api.post('/cupom', formData);
+        response = await api.post("/cupom", formData);
       }
 
       if (response.status === 200 || response.status === 201) {
         toaster.create({
-          title: editingCupom ? "Cupom atualizado com sucesso!" : "Cupom criado com sucesso!",
+          title: editingCupom
+            ? "Cupom atualizado com sucesso!"
+            : "Cupom criado com sucesso!",
           type: "success",
         });
         if (onCreated) onCreated();
@@ -77,12 +87,12 @@ export default function DialogCreateCupom({ isOpen, onClose, onCreated, editingC
     } catch (error) {
       toaster.create({
         title: "Erro ao salvar cupom.",
-        status: "error",
+        type: "error",
       });
     } finally {
       setIsLoading(false);
     }
-};
+  };
 
   return (
     <Dialog.Root
@@ -92,7 +102,7 @@ export default function DialogCreateCupom({ isOpen, onClose, onCreated, editingC
       placement="center"
     >
       <Portal>
-        <Dialog.Backdrop/>
+        <Dialog.Backdrop />
         <Dialog.Positioner>
           <Dialog.Content bg="#181824" color="#fff" borderRadius="lg">
             <Dialog.Header>
@@ -103,14 +113,18 @@ export default function DialogCreateCupom({ isOpen, onClose, onCreated, editingC
             <Dialog.Body>
               <Box>
                 <VStack spacing={4} align="stretch">
-                  <FormLabel fontFamily="Montserrat" color="#e05a6d">Nome</FormLabel>
+                  <FormLabel fontFamily="Montserrat" color="#e05a6d">
+                    Nome
+                  </FormLabel>
                   <Input
                     fontFamily="Montserrat"
                     placeholder="Nome do cupom"
                     value={code}
-                    onChange={e => setCode(e.target.value)}
+                    onChange={(e) => setCode(e.target.value)}
                   />
-                  <FormLabel fontFamily="Montserrat" color="#e05a6d">Tipo</FormLabel>
+                  <FormLabel fontFamily="Montserrat" color="#e05a6d">
+                    Tipo
+                  </FormLabel>
                   <Select.Root
                     width="100%"
                     collection={typesCollection}
@@ -126,7 +140,7 @@ export default function DialogCreateCupom({ isOpen, onClose, onCreated, editingC
                         <Select.Indicator />
                       </Select.IndicatorGroup>
                     </Select.Control>
-                   <Select.Positioner>
+                    <Select.Positioner>
                       <Select.Content bg="#black" color="#fff">
                         {typesCollection.items.map((type) => (
                           <Select.Item item={type} key={type.value}>
@@ -137,20 +151,24 @@ export default function DialogCreateCupom({ isOpen, onClose, onCreated, editingC
                       </Select.Content>
                     </Select.Positioner>
                   </Select.Root>
-                  <FormLabel fontFamily="Montserrat" color="#e05a6d">Valor</FormLabel>
-                    <Input  
-                      fontFamily="Montserrat"
-                      placeholder="0"
-                      value={value}
-                      onChange={e => setValue(e.target.value)}
-                    ></Input>
-                   <FormLabel fontFamily="Montserrat" color="#e05a6d">Usos disponíveis</FormLabel>
-                    <Input  
-                      fontFamily="Montserrat"
-                      placeholder="0"
-                      value={uses}
-                      onChange={e => setUses(e.target.value)}
-                    ></Input>  
+                  <FormLabel fontFamily="Montserrat" color="#e05a6d">
+                    Valor
+                  </FormLabel>
+                  <Input
+                    fontFamily="Montserrat"
+                    placeholder="0"
+                    value={value}
+                    onChange={(e) => setValue(e.target.value)}
+                  ></Input>
+                  <FormLabel fontFamily="Montserrat" color="#e05a6d">
+                    Usos disponíveis
+                  </FormLabel>
+                  <Input
+                    fontFamily="Montserrat"
+                    placeholder="0"
+                    value={uses}
+                    onChange={(e) => setUses(e.target.value)}
+                  ></Input>
                   <Button
                     mt={4}
                     bg="#e05a6d"
@@ -164,7 +182,7 @@ export default function DialogCreateCupom({ isOpen, onClose, onCreated, editingC
                       opacity: 0.9,
                       transform: "scale(1.01)",
                       transition: "0.3s",
-                      bg: "#db5c6e"
+                      bg: "#db5c6e",
                     }}
                   >
                     {editingCupom ? "Salvar alterações" : "Criar cupom"}

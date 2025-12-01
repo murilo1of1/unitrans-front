@@ -11,7 +11,7 @@ import {
   HStack,
 } from "@chakra-ui/react";
 import { FormLabel } from "@chakra-ui/form-control";
-import { Toaster, toaster } from "@/components/ui/toaster";
+import { toaster } from "@/components/ui/toaster";
 import api from "@/utils/axios";
 import { useState, useEffect } from "react";
 
@@ -61,7 +61,7 @@ export default function DialogAddCompany({
       console.error("Erro ao buscar empresas:", error);
       toaster.create({
         title: "Erro ao carregar empresas",
-        status: "error",
+        type: "error",
       });
     } finally {
       setIsLoadingCompanies(false);
@@ -72,7 +72,7 @@ export default function DialogAddCompany({
     if (!token.trim()) {
       toaster.create({
         title: "Token é obrigatório",
-        status: "error",
+        type: "error",
       });
       return;
     }
@@ -96,7 +96,7 @@ export default function DialogAddCompany({
       if (response.status === 200 || response.status === 201) {
         toaster.create({
           title: "Vínculo criado com sucesso!",
-          status: "success",
+          type: "success",
         });
         if (onCompanyAdded) onCompanyAdded();
         onClose();
@@ -106,7 +106,7 @@ export default function DialogAddCompany({
         error.response?.data?.message || "Erro ao usar token";
       toaster.create({
         title: errorMessage,
-        status: "error",
+        type: "error",
       });
     } finally {
       setIsLoading(false);
@@ -117,7 +117,7 @@ export default function DialogAddCompany({
     if (!selectedCompany) {
       toaster.create({
         title: "Selecione uma empresa",
-        status: "error",
+        type: "error",
       });
       return;
     }
@@ -141,7 +141,7 @@ export default function DialogAddCompany({
       if (response.status === 200 || response.status === 201) {
         toaster.create({
           title: "Solicitação enviada com sucesso!",
-          status: "success",
+          type: "success",
         });
         onClose();
       }
@@ -150,7 +150,7 @@ export default function DialogAddCompany({
         error.response?.data?.message || "Erro ao enviar solicitação";
       toaster.create({
         title: errorMessage,
-        status: "error",
+        type: "error",
       });
     } finally {
       setIsLoading(false);
@@ -401,7 +401,6 @@ export default function DialogAddCompany({
           </Dialog.Content>
         </Dialog.Positioner>
       </Portal>
-      <Toaster />
     </Dialog.Root>
   );
 }

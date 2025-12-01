@@ -3,6 +3,7 @@ import { Box, Flex, Text, Button, Image, VStack, Card } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/utils/axios";
+import { Toaster } from "@/components/ui/toaster";
 import DialogAddCompany from "@/components/dialogAddCompany";
 import TableSolicitationsUser from "@/components/tableSolicitationsUser";
 import DialogRoutePointsUser from "@/components/dialogRoutePointsUser";

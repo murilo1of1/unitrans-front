@@ -13,7 +13,7 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import { FormLabel } from "@chakra-ui/form-control";
-import { Toaster, toaster } from "@/components/ui/toaster";
+import { toaster } from "@/components/ui/toaster";
 import api from "@/utils/axios";
 import { useState, useEffect } from "react";
 import {
@@ -93,7 +93,7 @@ export default function DialogManageRoutePoints({ isOpen, onClose, route }) {
         `/pontos/empresa/${decodedToken.idEmpresa}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${authToken}`,
           },
         }
       );
@@ -107,7 +107,7 @@ export default function DialogManageRoutePoints({ isOpen, onClose, route }) {
       console.error("Erro ao buscar pontos disponíveis:", error);
       toaster.create({
         title: "Erro ao carregar pontos",
-        status: "error",
+        type: "error",
       });
     }
   };
@@ -119,7 +119,7 @@ export default function DialogManageRoutePoints({ isOpen, onClose, route }) {
       const authToken = localStorage.getItem("token");
       const response = await api.get(`/rotas/${route.id}/pontos`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${authToken}`,
         },
       });
 
@@ -144,7 +144,7 @@ export default function DialogManageRoutePoints({ isOpen, onClose, route }) {
       console.error("Erro ao buscar pontos da rota:", error);
       toaster.create({
         title: "Erro ao carregar pontos da rota",
-        status: "error",
+        type: "error",
       });
     }
   };
@@ -153,7 +153,7 @@ export default function DialogManageRoutePoints({ isOpen, onClose, route }) {
     if (!selectedPonto) {
       toaster.create({
         title: "Selecione um ponto",
-        status: "error",
+        type: "error",
       });
       return;
     }
@@ -165,9 +165,9 @@ export default function DialogManageRoutePoints({ isOpen, onClose, route }) {
       const currentTypePoints = currentStepData.data;
 
       const response = await api.post(
-        `/rota/${route.id}/pontos`,
+        `/rotas/${route.id}/pontos`,
         {
-          idPonto: selectedPonto,
+          idPonto: parseInt(selectedPonto),
           tipo: currentType,
           ordem: currentTypePoints.length + 1,
         },
@@ -181,7 +181,7 @@ export default function DialogManageRoutePoints({ isOpen, onClose, route }) {
       if (response.status === 201) {
         toaster.create({
           title: "Ponto adicionado à rota com sucesso!",
-          status: "success",
+          type: "success",
         });
         setSelectedPonto("");
         fetchRotaPontos();
@@ -190,7 +190,7 @@ export default function DialogManageRoutePoints({ isOpen, onClose, route }) {
       console.error("Erro ao adicionar ponto:", error);
       toaster.create({
         title: error.response?.data?.message || "Erro ao adicionar ponto",
-        status: "error",
+        type: "error",
       });
     } finally {
       setIsLoading(false);
@@ -204,7 +204,7 @@ export default function DialogManageRoutePoints({ isOpen, onClose, route }) {
         `/rotas/${route.id}/pontos/${rotaPontoId}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${authToken}`,
           },
         }
       );
@@ -212,7 +212,7 @@ export default function DialogManageRoutePoints({ isOpen, onClose, route }) {
       if (response.status === 200) {
         toaster.create({
           title: "Ponto removido da rota com sucesso!",
-          status: "success",
+          type: "success",
         });
         fetchRotaPontos();
       }
@@ -220,7 +220,7 @@ export default function DialogManageRoutePoints({ isOpen, onClose, route }) {
       console.error("Erro ao remover ponto:", error);
       toaster.create({
         title: error.response?.data?.message || "Erro ao remover ponto",
-        status: "error",
+        type: "error",
       });
     }
   };
@@ -262,7 +262,7 @@ export default function DialogManageRoutePoints({ isOpen, onClose, route }) {
               { ordem: update.ordem },
               {
                 headers: {
-                  Authorization: `Bearer ${token}`,
+                  Authorization: `Bearer ${authToken}`,
                 },
               }
             )
@@ -275,7 +275,7 @@ export default function DialogManageRoutePoints({ isOpen, onClose, route }) {
       console.error("Erro ao salvar ordem:", error);
       toaster.create({
         title: "Erro ao salvar ordem dos pontos",
-        status: "error",
+        type: "error",
       });
     }
   };
@@ -638,7 +638,6 @@ export default function DialogManageRoutePoints({ isOpen, onClose, route }) {
           </Dialog.Content>
         </Dialog.Positioner>
       </Portal>
-      <Toaster />
     </Dialog.Root>
   );
 }

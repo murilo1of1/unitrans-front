@@ -10,7 +10,7 @@ import {
   Badge,
   Flex,
 } from "@chakra-ui/react";
-import { Toaster, toaster } from "@/components/ui/toaster";
+import { toaster } from "@/components/ui/toaster";
 import api from "@/utils/axios";
 import { useState, useEffect } from "react";
 import { FiUsers, FiMapPin } from "react-icons/fi";
@@ -40,7 +40,7 @@ export default function DialogPassengerList({ isOpen, onClose, route }) {
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${authToken}`,
           },
         }
       );
@@ -52,7 +52,7 @@ export default function DialogPassengerList({ isOpen, onClose, route }) {
       console.error("Erro ao buscar passageiros:", error);
       toaster.create({
         title: "Erro ao carregar passageiros",
-        status: "error",
+        type: "error",
       });
     } finally {
       setIsLoading(false);
@@ -333,7 +333,6 @@ export default function DialogPassengerList({ isOpen, onClose, route }) {
           </Dialog.Content>
         </Dialog.Positioner>
       </Portal>
-      <Toaster />
     </Dialog.Root>
   );
 }

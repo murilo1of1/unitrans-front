@@ -10,7 +10,7 @@ import {
   Badge,
   Flex,
 } from "@chakra-ui/react";
-import { Toaster, toaster } from "@/components/ui/toaster";
+import { toaster } from "@/components/ui/toaster";
 import api from "@/utils/axios";
 import { useState, useEffect } from "react";
 import { FiMapPin, FiCheckCircle } from "react-icons/fi";
@@ -56,7 +56,7 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
       const authToken = localStorage.getItem("token");
       const response = await api.get(`/rotas/${route.id}/pontos`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${authToken}`,
         },
       });
 
@@ -74,7 +74,7 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
       console.error("Erro ao buscar pontos da rota:", error);
       toaster.create({
         title: "Erro ao carregar pontos da rota",
-        status: "error",
+        type: "error",
       });
     } finally {
       setIsLoading(false);
@@ -94,12 +94,25 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
   };
 
   const handleConfirm = async () => {
+    // Validar se algo foi selecionado
     if (!selectedEmbarque || !selectedDesembarque) {
       toaster.create({
         title: "Erro",
-        description: "Por favor, selecione pontos de embarque e desembarque.",
-        status: "error",
+        description:
+          "Por favor, selecione uma opção para embarque e desembarque.",
+        type: "error",
       });
+      return;
+    }
+
+    // Se ambos são "none", fechar sem salvar (não vai usar a rota)
+    if (selectedEmbarque === "none" && selectedDesembarque === "none") {
+      toaster.create({
+        title: "Nenhum ponto selecionado",
+        description: "Você optou por não usar esta rota hoje.",
+        type: "info",
+      });
+      onClose();
       return;
     }
 
@@ -139,8 +152,10 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
       const dadosEnvio = {
         idAluno: alunoId,
         idRota: route.id,
-        pontoEmbarque: selectedEmbarque,
-        pontoDesembarque: selectedDesembarque,
+        pontoEmbarque:
+          selectedEmbarque === "none" ? null : parseInt(selectedEmbarque),
+        pontoDesembarque:
+          selectedDesembarque === "none" ? null : parseInt(selectedDesembarque),
       };
 
       console.log("Dados que serão enviados:", dadosEnvio);
@@ -156,7 +171,7 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
         title: "Preferências salvas!",
         description:
           "Suas escolhas de embarque e desembarque foram registradas.",
-        status: "success",
+        type: "success",
       });
 
       onClose();
@@ -166,7 +181,7 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
         title: "Erro ao salvar",
         description:
           error.response?.data?.message || "Erro interno do servidor",
-        status: "error",
+        type: "error",
       });
     } finally {
       setIsLoading(false);
@@ -558,7 +573,6 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
           </Dialog.Content>
         </Dialog.Positioner>
       </Portal>
-      <Toaster />
     </Dialog.Root>
   );
 }
