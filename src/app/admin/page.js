@@ -897,7 +897,7 @@ export default function Admin() {
   }, [router, activeSection]);
 
   return (
-    <Box minH="100vh" bg="#E2E8F0">
+    <Box minH="100vh" bg="#E2E8F0" suppressHydrationWarning>
       <Flex
         as="header"
         justify="space-between"
@@ -949,7 +949,7 @@ export default function Admin() {
         </Flex>
       </Flex>
 
-      <Flex pt="80px">
+      <Flex pt="80px" suppressHydrationWarning>
         <Box
           w="280px"
           bg="#2c2b3c"
@@ -957,6 +957,7 @@ export default function Admin() {
           position="fixed"
           left={0}
           top="80px"
+          suppressHydrationWarning
         >
           <VStack spacing={1} align="stretch" p={4}>
             <Button
@@ -1054,7 +1055,7 @@ export default function Admin() {
           </VStack>
         </Box>
 
-        <Box ml="280px" flex={1} p={8}>
+        <Box ml="280px" flex={1} p={8} suppressHydrationWarning>
           {renderContent()}
         </Box>
       </Flex>

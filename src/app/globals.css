@@ -39,6 +39,42 @@ input[type="email"],
 input[type="password"] {
   color: white !important;
   -webkit-text-fill-color: white !important;
+  caret-color: white !important;
+}
+
+/* Chakra UI inputs - força branco */
+input[data-scope="input"] {
+  color: white !important;
+  -webkit-text-fill-color: white !important;
+}
+
+/* Botão de mostrar/ocultar senha branco */
+[data-scope="password-input"] button,
+button[data-scope="password-input"][data-part="trigger"] {
+  color: white !important;
+  opacity: 0.8;
+}
+
+[data-scope="password-input"] button:hover,
+button[data-scope="password-input"][data-part="trigger"]:hover {
+  color: white !important;
+  opacity: 1;
+}
+
+/* Ícones dentro dos inputs e password */
+[data-scope="password-input"] svg,
+svg[data-part="icon"] {
+  color: white !important;
+  fill: white !important;
+}
+
+/* InputGroup elements */
+[data-scope="input-group"] button {
+  color: white !important;
+}
+
+[data-scope="input-group"] svg {
+  color: white !important;
 }
 
 /* ========================================
