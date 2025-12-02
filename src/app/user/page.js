@@ -1,5 +1,14 @@
 "use client";
-import { Box, Flex, Text, Button, Image, VStack, Card } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Text,
+  Button,
+  Image,
+  VStack,
+  Card,
+  Stack,
+} from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/utils/axios";
@@ -20,6 +29,7 @@ export default function User() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isRoutePointsDialogOpen, setIsRoutePointsDialogOpen] = useState(false);
   const [selectedRoute, setSelectedRoute] = useState(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const router = useRouter();
 
   const decodeToken = (token) => {
@@ -48,6 +58,7 @@ export default function User() {
 
   const handleSectionChange = (section) => {
     setActiveSection(section);
+    setIsDrawerOpen(false);
 
     if (section === "solicitacoes") {
       const token = localStorage.getItem("token");
@@ -155,7 +166,6 @@ export default function User() {
   const fetchRotas = async (idAluno, token) => {
     setLoadingRotas(true);
     try {
-      // Primeiro busca as empresas vinculadas ao aluno
       const empresasResponse = await api.get(
         `/vinculos/aluno/${idAluno}?ativo=true`,
         {
@@ -168,7 +178,6 @@ export default function User() {
       const empresasVinculadas = empresasResponse.data?.data || [];
       const todasRotas = [];
 
-      // Para cada empresa, busca suas rotas
       for (const vinculo of empresasVinculadas) {
         if (vinculo.empresa?.id) {
           try {
@@ -182,7 +191,6 @@ export default function User() {
             );
 
             const rotasEmpresa = rotasResponse.data?.data || [];
-            // Adiciona informação da empresa em cada rota
             const rotasComEmpresa = rotasEmpresa.map((rota) => ({
               ...rota,
               empresa: vinculo.empresa,
@@ -265,11 +273,16 @@ export default function User() {
                       transition: "all 0.2s",
                     }}
                   >
-                    <Flex justifyContent="space-between" alignItems="center">
-                      <Box>
+                    <Flex
+                      justifyContent="space-between"
+                      alignItems={{ base: "flex-start", md: "center" }}
+                      direction={{ base: "column", md: "row" }}
+                      gap={{ base: 3, md: 0 }}
+                    >
+                      <Box flex="1">
                         <Text
                           fontFamily="Montserrat"
-                          fontSize="xl"
+                          fontSize={{ base: "lg", md: "xl" }}
                           fontWeight="bold"
                           color="#334155"
                         >
@@ -300,7 +313,8 @@ export default function User() {
                         </Text>
                       </Box>
                       <Button
-                        size="sm"
+                        size={{ base: "md", md: "sm" }}
+                        width={{ base: "100%", md: "auto" }}
                         bg="#fdb525"
                         color="white"
                         fontFamily="Montserrat"
@@ -466,8 +480,6 @@ export default function User() {
 
     const decodedToken = decodeToken(token);
 
-    console.log("Decoded token:", decodedToken); // Debug
-
     if (!decodedToken || (!decodedToken.idAluno && !decodedToken.id)) {
       console.error("Token inválido");
       router.push("/login");
@@ -475,19 +487,121 @@ export default function User() {
     }
 
     setAluno(decodedToken);
-    // Usa idAluno se existir, senão usa id
     const studentId = decodedToken.idAluno || decodedToken.id;
-    // Carrega rotas por padrão (seção inicial) e empresas para que estejam prontas
     fetchRotas(studentId, token);
     fetchCompanies(studentId, token);
   }, [router]);
+
+  const SidebarContent = () => (
+    <VStack spacing={1} align="stretch" p={4}>
+      <Button
+        bg={activeSection === "rotas" ? "#fdb525" : "transparent"}
+        color="white"
+        fontFamily="Montserrat"
+        fontWeight="500"
+        justifyContent="flex-start"
+        borderRadius="lg"
+        py={6}
+        px={4}
+        mb={1}
+        leftIcon={<Text fontSize="md">🛣️</Text>}
+        _hover={{
+          bg: activeSection === "rotas" ? "#fdb525" : "#475569",
+          transform: "scale(1.01)",
+          transition: "0.2s",
+        }}
+        onClick={() => handleSectionChange("rotas")}
+      >
+        Rotas
+      </Button>
+      <Button
+        bg={activeSection === "empresas" ? "#fdb525" : "transparent"}
+        color="white"
+        fontFamily="Montserrat"
+        fontWeight="500"
+        justifyContent="flex-start"
+        borderRadius="lg"
+        py={6}
+        px={4}
+        mb={1}
+        leftIcon={<Text fontSize="md">🏢</Text>}
+        _hover={{
+          bg: activeSection === "empresas" ? "#fdb525" : "#475569",
+          transform: "scale(1.01)",
+          transition: "0.2s",
+        }}
+        onClick={() => handleSectionChange("empresas")}
+      >
+        Empresas
+      </Button>
+      <Button
+        bg={activeSection === "pagamentos" ? "#fdb525" : "transparent"}
+        color="white"
+        fontFamily="Montserrat"
+        fontWeight="500"
+        justifyContent="flex-start"
+        borderRadius="lg"
+        py={6}
+        px={4}
+        mb={1}
+        leftIcon={<Text fontSize="md">💳</Text>}
+        _hover={{
+          bg: activeSection === "pagamentos" ? "#fdb525" : "#475569",
+          transform: "scale(1.01)",
+          transition: "0.2s",
+        }}
+        onClick={() => handleSectionChange("pagamentos")}
+      >
+        Pagamentos
+      </Button>
+      <Button
+        bg={activeSection === "solicitacoes" ? "#fdb525" : "transparent"}
+        color="white"
+        fontFamily="Montserrat"
+        fontWeight="500"
+        justifyContent="flex-start"
+        borderRadius="lg"
+        py={6}
+        px={4}
+        mb={1}
+        leftIcon={<Text fontSize="md">📋</Text>}
+        _hover={{
+          bg: activeSection === "solicitacoes" ? "#fdb525" : "#475569",
+          transform: "scale(1.01)",
+          transition: "0.2s",
+        }}
+        onClick={() => handleSectionChange("solicitacoes")}
+      >
+        Solicitações
+      </Button>
+      <Button
+        bg={activeSection === "configuracoes" ? "#fdb525" : "transparent"}
+        color="white"
+        fontFamily="Montserrat"
+        fontWeight="500"
+        justifyContent="flex-start"
+        borderRadius="lg"
+        py={6}
+        px={4}
+        leftIcon={<Text fontSize="md">⚙️</Text>}
+        _hover={{
+          bg: activeSection === "configuracoes" ? "#fdb525" : "#475569",
+          transform: "scale(1.01)",
+          transition: "0.2s",
+        }}
+        onClick={() => handleSectionChange("configuracoes")}
+      >
+        Configurações
+      </Button>
+    </VStack>
+  );
 
   return (
     <Box minH="100vh" bg="#E2E8F0" suppressHydrationWarning>
       <Flex
         as="header"
         justify="space-between"
-        w="100%"
+        w="100vw"
         h="80px"
         bg="white"
         color="#334155"
@@ -495,22 +609,39 @@ export default function User() {
         position="fixed"
         top={0}
         left={0}
+        right={0}
         boxShadow="0 1px 3px 0 rgba(0, 0, 0, 0.1)"
+        zIndex={999}
+        px={{ base: 4, md: 4 }}
       >
-        <Flex align="center">
+        <Flex align="center" gap={2}>
+          <Button
+            display={{ base: "flex", md: "none" }}
+            aria-label="Menu"
+            bg="transparent"
+            color="#334155"
+            fontSize="2xl"
+            p={2}
+            minW="auto"
+            h="auto"
+            _hover={{ bg: "#E2E8F0" }}
+            onClick={() => setIsDrawerOpen(true)}
+          >
+            ☰
+          </Button>
           <Image
             src="/logosolo.png"
             alt="logo"
             objectFit="contain"
-            boxSize="100px"
+            boxSize={{ base: "60px", md: "100px" }}
             mt={2}
-            ml={4}
           />
           <Text
             fontFamily="Montserrat"
             color="#334155"
             fontWeight="bold"
-            fontSize="lg"
+            fontSize={{ base: "sm", md: "lg" }}
+            display={{ base: "none", sm: "block" }}
           >
             Área do Aluno {aluno ? `- ${aluno.nome}` : ""}
           </Text>
@@ -522,7 +653,8 @@ export default function User() {
             fontFamily="Montserrat"
             fontWeight="bold"
             borderRadius="md"
-            mr={8}
+            mr={{ base: 2, md: 8 }}
+            size={{ base: "sm", md: "md" }}
             _hover={{
               bg: "#f59e0b",
               transform: "scale(1.02)",
@@ -535,6 +667,67 @@ export default function User() {
         </Flex>
       </Flex>
 
+      {/* Navbar lateral mobile */}
+      {isDrawerOpen && (
+        <>
+          {/* Backdrop simples */}
+          <Box
+            position="fixed"
+            top={0}
+            left={0}
+            right={0}
+            bottom={0}
+            bg="blackAlpha.600"
+            zIndex={1000}
+            display={{ base: "block", md: "none" }}
+            onClick={() => setIsDrawerOpen(false)}
+          />
+          {/* Navbar lateral */}
+          <Box
+            position="fixed"
+            top={0}
+            left={0}
+            bottom={0}
+            w="280px"
+            bg="#2c2b3c"
+            zIndex={1001}
+            display={{ base: "block", md: "none" }}
+            boxShadow="2px 0 8px rgba(0, 0, 0, 0.3)"
+          >
+            <Flex
+              h="80px"
+              align="center"
+              justify="space-between"
+              px={4}
+              borderBottom="1px solid #475569"
+            >
+              <Text
+                color="white"
+                fontFamily="Montserrat"
+                fontWeight="bold"
+                fontSize="lg"
+              >
+                Menu
+              </Text>
+              <Button
+                aria-label="Fechar menu"
+                color="white"
+                fontSize="2xl"
+                bg="transparent"
+                p={2}
+                minW="auto"
+                h="auto"
+                _hover={{ bg: "#475569" }}
+                onClick={() => setIsDrawerOpen(false)}
+              >
+                ✕
+              </Button>
+            </Flex>
+            <SidebarContent />
+          </Box>
+        </>
+      )}
+
       <Flex pt="80px" suppressHydrationWarning>
         <Box
           w="280px"
@@ -543,112 +736,18 @@ export default function User() {
           position="fixed"
           left={0}
           top="80px"
+          display={{ base: "none", md: "block" }}
           suppressHydrationWarning
         >
-          <VStack spacing={1} align="stretch" p={4}>
-            <Button
-              bg={activeSection === "rotas" ? "#fdb525" : "transparent"}
-              color="white"
-              fontFamily="Montserrat"
-              fontWeight="500"
-              justifyContent="flex-start"
-              borderRadius="lg"
-              py={6}
-              px={4}
-              mb={1}
-              leftIcon={<Text fontSize="md">🛣️</Text>}
-              _hover={{
-                bg: activeSection === "rotas" ? "#fdb525" : "#475569",
-                transform: "scale(1.01)",
-                transition: "0.2s",
-              }}
-              onClick={() => handleSectionChange("rotas")}
-            >
-              Rotas
-            </Button>
-            <Button
-              bg={activeSection === "empresas" ? "#fdb525" : "transparent"}
-              color="white"
-              fontFamily="Montserrat"
-              fontWeight="500"
-              justifyContent="flex-start"
-              borderRadius="lg"
-              py={6}
-              px={4}
-              mb={1}
-              leftIcon={<Text fontSize="md">🏢</Text>}
-              _hover={{
-                bg: activeSection === "empresas" ? "#fdb525" : "#475569",
-                transform: "scale(1.01)",
-                transition: "0.2s",
-              }}
-              onClick={() => handleSectionChange("empresas")}
-            >
-              Empresas
-            </Button>
-            <Button
-              bg={activeSection === "pagamentos" ? "#fdb525" : "transparent"}
-              color="white"
-              fontFamily="Montserrat"
-              fontWeight="500"
-              justifyContent="flex-start"
-              borderRadius="lg"
-              py={6}
-              px={4}
-              mb={1}
-              leftIcon={<Text fontSize="md">💳</Text>}
-              _hover={{
-                bg: activeSection === "pagamentos" ? "#fdb525" : "#475569",
-                transform: "scale(1.01)",
-                transition: "0.2s",
-              }}
-              onClick={() => handleSectionChange("pagamentos")}
-            >
-              Pagamentos
-            </Button>
-            <Button
-              bg={activeSection === "solicitacoes" ? "#fdb525" : "transparent"}
-              color="white"
-              fontFamily="Montserrat"
-              fontWeight="500"
-              justifyContent="flex-start"
-              borderRadius="lg"
-              py={6}
-              px={4}
-              mb={1}
-              leftIcon={<Text fontSize="md">📋</Text>}
-              _hover={{
-                bg: activeSection === "solicitacoes" ? "#fdb525" : "#475569",
-                transform: "scale(1.01)",
-                transition: "0.2s",
-              }}
-              onClick={() => handleSectionChange("solicitacoes")}
-            >
-              Solicitações
-            </Button>
-            <Button
-              bg={activeSection === "configuracoes" ? "#fdb525" : "transparent"}
-              color="white"
-              fontFamily="Montserrat"
-              fontWeight="500"
-              justifyContent="flex-start"
-              borderRadius="lg"
-              py={6}
-              px={4}
-              leftIcon={<Text fontSize="md">⚙️</Text>}
-              _hover={{
-                bg: activeSection === "configuracoes" ? "#fdb525" : "#475569",
-                transform: "scale(1.01)",
-                transition: "0.2s",
-              }}
-              onClick={() => handleSectionChange("configuracoes")}
-            >
-              Configurações
-            </Button>
-          </VStack>
+          <SidebarContent />
         </Box>
 
-        <Box ml="280px" flex={1} p={8} suppressHydrationWarning>
+        <Box
+          ml={{ base: 0, md: "280px" }}
+          flex={1}
+          p={{ base: 4, md: 8 }}
+          suppressHydrationWarning
+        >
           {renderContent()}
         </Box>
       </Flex>
