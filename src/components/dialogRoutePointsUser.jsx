@@ -486,7 +486,12 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
             </Dialog.Body>
 
             <Dialog.Footer borderTop="1px solid #e2e8f0" pt={4}>
-              <HStack spacing={3} justify="space-between" w="100%">
+              <Flex
+                direction={{ base: "column", md: "row" }}
+                justify="space-between"
+                w="100%"
+                gap={3}
+              >
                 <Button
                   bg="#fdb525"
                   color="white"
@@ -494,6 +499,7 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
                   fontWeight="bold"
                   onClick={handlePrevious}
                   isDisabled={currentStep === 0}
+                  w={{ base: "100%", md: "auto" }}
                   _hover={{
                     bg: "#f59e0b",
                     transform: "scale(1.02)",
@@ -509,15 +515,20 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
                   Anterior
                 </Button>
 
-                <HStack spacing={3}>
+                <Flex
+                  direction={{ base: "column", sm: "row" }}
+                  gap={3}
+                  w={{ base: "100%", md: "auto" }}
+                >
                   <Button
-                    bg="#fdb525"
-                    color="white"
+                    bg="#e2e8f0"
+                    color="#475569"
                     fontFamily="Montserrat"
                     fontWeight="bold"
                     onClick={onClose}
+                    w={{ base: "100%", sm: "auto" }}
                     _hover={{
-                      bg: "#f59e0b",
+                      bg: "#cbd5e1",
                       transform: "scale(1.02)",
                       transition: "0.3s",
                     }}
@@ -534,10 +545,17 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
                       onClick={handleConfirm}
                       isDisabled={!selectedDesembarque || isLoading}
                       isLoading={isLoading}
+                      w={{ base: "100%", sm: "auto" }}
                       _hover={{
                         bg: "#f59e0b",
                         transform: "scale(1.02)",
                         transition: "0.3s",
+                      }}
+                      _disabled={{
+                        bg: "#d1d5db",
+                        color: "#9ca3af",
+                        cursor: "not-allowed",
+                        transform: "none",
                       }}
                     >
                       Confirmar Escolhas
@@ -550,17 +568,24 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
                       fontWeight="bold"
                       onClick={handleNext}
                       isDisabled={!selectedEmbarque}
+                      w={{ base: "100%", sm: "auto" }}
                       _hover={{
                         bg: "#f59e0b",
                         transform: "scale(1.02)",
                         transition: "0.3s",
                       }}
+                      _disabled={{
+                        bg: "#d1d5db",
+                        color: "#9ca3af",
+                        cursor: "not-allowed",
+                        transform: "none",
+                      }}
                     >
                       Próximo
                     </Button>
                   )}
-                </HStack>
-              </HStack>
+                </Flex>
+              </Flex>
             </Dialog.Footer>
 
             <Dialog.CloseTrigger asChild>
