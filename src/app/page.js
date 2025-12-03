@@ -17,12 +17,15 @@ export default function HomePage() {
   return (
     <Box
       minH="100vh"
+      maxH="100vh"
+      w="100vw"
+      overflow="hidden"
       bgImage="url(/fundotelainicial.png)"
       bgSize="cover"
       bgPosition="center"
       bgRepeat="no-repeat"
+      suppressHydrationWarning
     >
-      {/* Header Responsivo */}
       <Flex
         as="header"
         w="100%"
@@ -35,6 +38,7 @@ export default function HomePage() {
         boxSizing="border-box"
         position="relative"
         zIndex={10}
+        suppressHydrationWarning
       >
         {/* Logo */}
         <Flex align="center" gap={2}>
@@ -171,7 +175,6 @@ export default function HomePage() {
         </Flex>
       </Flex>
 
-      {/* Conteúdo Principal Responsivo */}
       <Flex
         w="100%"
         minH={{ base: "calc(100vh - 70px)", md: "calc(100vh - 100px)" }}
@@ -181,6 +184,7 @@ export default function HomePage() {
         py={{ base: 6, md: 8 }}
         flexDirection={{ base: "column", md: "row" }}
         gap={{ base: 6, md: 0 }}
+        suppressHydrationWarning
       >
         {/* Seção de Texto e CTA */}
         <VStack
@@ -229,13 +233,11 @@ export default function HomePage() {
           </Button>
         </VStack>
 
-        {/* Mascote - Responsivo */}
         <Box
           display="flex"
           justifyContent={{ base: "center", md: "flex-end" }}
           flex={{ base: "none", md: 1 }}
-          position={{ base: "relative", md: "static" }}
-          top={{ base: "-260px", md: "auto" }}
+          mt={{ base: -12, md: 0 }}
         >
           <Image
             src="/mascotao.png"

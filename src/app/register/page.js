@@ -47,16 +47,19 @@ export default function Register() {
 
   return (
     <Box
-      w="100%"
+      w="100vw"
       h="100vh"
+      maxH="100vh"
+      overflow="hidden"
       display="flex"
       justifyContent="center"
       alignItems="center"
       filter="contrast(95%)"
       bgImage={"url(/fundotelainicial.png)"}
-      bgSize="100% 115%"
+      bgSize="cover"
       bgPosition="center"
       bgRepeat="no-repeat"
+      suppressHydrationWarning
     >
       <Box
         w={{ base: "100%", md: "50%" }}
