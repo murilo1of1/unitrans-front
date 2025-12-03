@@ -44,8 +44,8 @@ export default function LoginInput({ mandarDadosdofilho }) {
           variant="outline"
           placeholder="Email"
           fontFamily="Montserrat"
-          fontSize={{ base: "14px", md: "16px" }} // Mobile menor
-          h={{ base: "38px", md: "45px" }} // Mobile menor
+          fontSize="16px"
+          h="45px"
           color="white"
           _placeholder={{ color: "white" }}
           onChange={(e) => setEmail(e.target.value)}
@@ -63,8 +63,8 @@ export default function LoginInput({ mandarDadosdofilho }) {
           variant="outline"
           placeholder="Senha"
           fontFamily="Montserrat"
-          fontSize={{ base: "14px", md: "16px" }}
-          h={{ base: "38px", md: "45px" }}
+          fontSize="16px"
+          h="45px"
           color="white"
           _placeholder={{ color: "white" }}
           onChange={(e) => setSenha(e.target.value)}

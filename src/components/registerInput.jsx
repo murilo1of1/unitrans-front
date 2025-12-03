@@ -25,8 +25,8 @@ export default function RegisterInput({ mandarDadosdofilho }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const stackMaxW = useBreakpointValue({ base: "80%", md: "450px" });
-  const inputFontSize = useBreakpointValue({ base: "14px", md: "16px" });
-  const inputHeight = useBreakpointValue({ base: "40px", md: "45px" });
+  const inputFontSize = "16px";
+  const inputHeight = useBreakpointValue({ base: "45px", md: "45px" });
   const buttonPaddingY = useBreakpointValue({ base: 2, md: 4 });
 
   const getContent = () => {
@@ -107,8 +107,14 @@ export default function RegisterInput({ mandarDadosdofilho }) {
             onChange={(e) => setNome(e.target.value)}
             color="white"
             _placeholder={{ color: "gray.400" }}
-            fontSize={inputFontSize}
+            fontSize="16px"
             height={inputHeight}
+            css={{
+              "&:-webkit-autofill": {
+                WebkitBoxShadow: "0 0 0 30px #282738 inset !important",
+                WebkitTextFillColor: "white !important",
+              },
+            }}
           />
 
           <Input

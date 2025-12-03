@@ -65,8 +65,10 @@ export default function LoginPc() {
 
   return (
     <Box
-      w="100%"
+      w="100vw"
       h="100vh"
+      maxH="100vh"
+      overflow="hidden"
       display="flex"
       justifyContent="center"
       alignItems="center"
@@ -75,6 +77,7 @@ export default function LoginPc() {
       bgSize="cover"
       bgPosition="center"
       bgRepeat="no-repeat"
+      suppressHydrationWarning
     >
       <Box
         w="500px"
