@@ -1,7 +1,7 @@
 "use client";
 import { Box, Flex, Text, Button, Spinner, Badge } from "@chakra-ui/react";
 
-export default function TableStudents({ students, loading, onRemoveStudent }) {
+export default function TableStudents({ students, loading, onRemoveStudent, onCobrarStudent }) {
   if (loading) {
     return (
       <Flex justify="center" align="center" h="200px">
@@ -155,6 +155,21 @@ export default function TableStudents({ students, loading, onRemoveStudent }) {
               </Box>
 
               <Box flex="2" textAlign="right">
+                {student.ativo && (
+                  <Button
+                    size="sm"
+                    bg="#fdb525"
+                    color="white"
+                    fontFamily="Montserrat"
+                    fontWeight="bold"
+                    mr={2}
+                    _hover={{ bg: "#f59e0b", transform: "scale(1.02)", transition: "0.2s" }}
+                    onClick={() => onCobrarStudent && onCobrarStudent(student)}
+                  >
+                    Cobrar
+                  </Button>
+                )}
+
                 {student.ativo ? (
                   <Button
                     size="sm"
