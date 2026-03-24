@@ -12,7 +12,7 @@ export default function LoginPc() {
 
   const loginUsuario = async (content) => {
     try {
-      const response = await api.post(`/auth/login`, { ...content });
+      const response = await api.post(`/aluno/login`, { ...content });
       if (response.status == 200 || response.status == 201) {
         const token = response.data.response;
         localStorage.setItem("token", token);
@@ -34,7 +34,7 @@ export default function LoginPc() {
     }
 
     try {
-      const response = await api.post(`/auth/login-empresa`, { ...content });
+      const response = await api.post(`/empresa/login`, { ...content });
       if (response.status == 200 || response.status == 201) {
         const token = response.data.response;
         localStorage.setItem("token", token);

@@ -12,7 +12,7 @@ export default function Register() {
 
   const registerUsuario = async (content, userType) => {
     try {
-      const endpoint = userType === "aluno" ? "/alunos" : "/empresas";
+      const endpoint = userType === "aluno" ? "/aluno" : "/empresa";
       const response = await axios.post(endpoint, { ...content });
 
       if (response.status == 200 || response.status === 201) {

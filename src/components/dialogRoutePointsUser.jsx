@@ -15,13 +15,30 @@ import api from "@/utils/axios";
 import { useState, useEffect } from "react";
 import { FiMapPin, FiCheckCircle } from "react-icons/fi";
 
+function decodeToken(token) {
+  const base64Url = token.split(".")[1];
+  const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+  const jsonPayload = decodeURIComponent(
+    atob(base64)
+      .split("")
+      .map((c) => `%${(`00${c.charCodeAt(0).toString(16)}`).slice(-2)}`)
+      .join("")
+  );
+
+  return JSON.parse(jsonPayload);
+}
+
 export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
   const [pontosEmbarque, setPontosEmbarque] = useState([]);
   const [pontosDesembarque, setPontosDesembarque] = useState([]);
-  const [currentStep, setCurrentStep] = useState(0); // 0 = Embarque, 1 = Desembarque
+  const [currentStep, setCurrentStep] = useState(0);
   const [selectedEmbarque, setSelectedEmbarque] = useState("");
   const [selectedDesembarque, setSelectedDesembarque] = useState("");
+  const [selectedAssento, setSelectedAssento] = useState(null);
+  const [capacidadeAssentos, setCapacidadeAssentos] = useState(40);
+  const [assentosOcupados, setAssentosOcupados] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingSeats, setIsLoadingSeats] = useState(false);
 
   const steps = [
     {
@@ -40,10 +57,24 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
       onChange: setSelectedDesembarque,
       noOptionText: "Não vou desembarcar nesta rota",
     },
+    {
+      title: "Reserva de Assento",
+      subtitle: "Escolha um assento disponível para finalizar",
+      data: [],
+      selectedValue: selectedAssento,
+      onChange: setSelectedAssento,
+      noOptionText: "",
+    },
   ];
 
   useEffect(() => {
     if (isOpen && route) {
+      setCurrentStep(0);
+      setSelectedEmbarque("");
+      setSelectedDesembarque("");
+      setSelectedAssento(null);
+      setAssentosOcupados([]);
+      setCapacidadeAssentos(route.capacidadeAssentos || 40);
       fetchRotaPontos();
     }
   }, [isOpen, route]);
@@ -62,43 +93,79 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
 
       if (response.data && response.data.data) {
         const pontos = response.data.data;
-
-        // Separar pontos por tipo
-        const embarque = pontos.filter((p) => p.tipo === "embarque");
-        const desembarque = pontos.filter((p) => p.tipo === "desembarque");
-
-        setPontosEmbarque(embarque);
-        setPontosDesembarque(desembarque);
+        setPontosEmbarque(pontos.filter((p) => p.tipo === "embarque"));
+        setPontosDesembarque(pontos.filter((p) => p.tipo === "desembarque"));
       }
     } catch (error) {
-      console.error("Erro ao buscar pontos da rota:", error);
       toaster.create({
         title: "Erro ao carregar pontos da rota",
-        status: "error",
+        type: "error",
       });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleNext = () => {
+  const fetchMapaAssentos = async () => {
+    if (!route?.id) return;
+
+    setIsLoadingSeats(true);
+    try {
+      const authToken = localStorage.getItem("token");
+      const response = await api.get(`/rota/${route.id}/assentos`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      const data = response.data?.data;
+      setCapacidadeAssentos(data?.capacidadeAssentos || route.capacidadeAssentos || 40);
+      setAssentosOcupados(data?.assentosOcupados || []);
+    } catch (error) {
+      toaster.create({
+        title: "Erro ao carregar mapa de assentos",
+        type: "error",
+      });
+    } finally {
+      setIsLoadingSeats(false);
+    }
+  };
+
+  const canGoNext =
+    (currentStep === 0 && selectedEmbarque && selectedEmbarque !== "none") ||
+    (currentStep === 1 &&
+      selectedDesembarque &&
+      selectedDesembarque !== "none");
+
+  const handleNext = async () => {
+    if (currentStep === 1) {
+      await fetchMapaAssentos();
+    }
+
     if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
+      setCurrentStep((prev) => prev + 1);
     }
   };
 
   const handlePrevious = () => {
     if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
+      setCurrentStep((prev) => prev - 1);
     }
   };
 
   const handleConfirm = async () => {
-    if (!selectedEmbarque || !selectedDesembarque) {
+    if (
+      !selectedEmbarque ||
+      selectedEmbarque === "none" ||
+      !selectedDesembarque ||
+      selectedDesembarque === "none" ||
+      !selectedAssento
+    ) {
       toaster.create({
-        title: "Erro",
-        description: "Por favor, selecione pontos de embarque e desembarque.",
-        status: "error",
+        title: "Dados incompletos",
+        description:
+          "Selecione embarque, desembarque e um assento disponível.",
+        type: "error",
       });
       return;
     }
@@ -106,31 +173,13 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
     setIsLoading(true);
 
     try {
-      // Buscar dados do aluno do localStorage/token
       const token = localStorage.getItem("token");
       if (!token) {
         throw new Error("Token não encontrado");
       }
 
-      // Decodificar token para pegar ID do aluno
-      const base64Url = token.split(".")[1];
-      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-      const jsonPayload = decodeURIComponent(
-        atob(base64)
-          .split("")
-          .map(function (c) {
-            return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-          })
-          .join("")
-      );
-      const decodedToken = JSON.parse(jsonPayload);
-
-      console.log("Token decodificado completo:", decodedToken);
-
-      // Usar o campo correto do token
+      const decodedToken = decodeToken(token);
       const alunoId = decodedToken.idAluno;
-
-      console.log("ID do aluno encontrado:", alunoId);
 
       if (!alunoId) {
         throw new Error("ID do aluno não encontrado no token");
@@ -141,11 +190,9 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
         idRota: route.id,
         pontoEmbarque: selectedEmbarque,
         pontoDesembarque: selectedDesembarque,
+        numeroAssento: Number(selectedAssento),
       };
 
-      console.log("Dados que serão enviados:", dadosEnvio);
-
-      // Chamar endpoint para salvar escolhas
       await api.post("/aluno/escolher-pontos", dadosEnvio, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -153,20 +200,19 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
       });
 
       toaster.create({
-        title: "Preferências salvas!",
+        title: "Reserva confirmada!",
         description:
-          "Suas escolhas de embarque e desembarque foram registradas.",
-        status: "success",
+          "Seus pontos e assento foram registrados com sucesso.",
+        type: "success",
       });
 
       onClose();
     } catch (error) {
-      console.error("Erro ao salvar escolhas:", error);
       toaster.create({
-        title: "Erro ao salvar",
+        title: "Erro ao confirmar",
         description:
           error.response?.data?.message || "Erro interno do servidor",
-        status: "error",
+        type: "error",
       });
     } finally {
       setIsLoading(false);
@@ -182,67 +228,38 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
       overflow="hidden"
       boxShadow="0 1px 3px 0 rgba(0, 0, 0, 0.1)"
     >
-      {/* Header */}
       <Flex bg="#f8fafc" p={3} borderBottom="1px solid" borderColor="gray.200">
         <Box w="60px" textAlign="center">
-          <Text
-            fontFamily="Montserrat"
-            fontWeight="bold"
-            color="#334155"
-            fontSize="sm"
-          >
+          <Text fontFamily="Montserrat" fontWeight="bold" color="#334155" fontSize="sm">
             Escolha
           </Text>
         </Box>
         <Box flex="1" px={3}>
-          <Text
-            fontFamily="Montserrat"
-            fontWeight="bold"
-            color="#334155"
-            fontSize="sm"
-          >
+          <Text fontFamily="Montserrat" fontWeight="bold" color="#334155" fontSize="sm">
             Nome do Ponto
           </Text>
         </Box>
         <Box flex="1" px={3}>
-          <Text
-            fontFamily="Montserrat"
-            fontWeight="bold"
-            color="#334155"
-            fontSize="sm"
-          >
+          <Text fontFamily="Montserrat" fontWeight="bold" color="#334155" fontSize="sm">
             Endereço
           </Text>
         </Box>
         <Box w="80px" textAlign="center">
-          <Text
-            fontFamily="Montserrat"
-            fontWeight="bold"
-            color="#334155"
-            fontSize="sm"
-          >
+          <Text fontFamily="Montserrat" fontWeight="bold" color="#334155" fontSize="sm">
             Ordem
           </Text>
         </Box>
       </Flex>
 
-      {/* Body */}
       <VStack spacing={0}>
-        {pontos.map((rotaPonto, index) => (
+        {pontos.map((rotaPonto) => (
           <Flex
             key={rotaPonto.id}
             w="full"
             p={3}
-            bg={
-              selectedValue === rotaPonto.ponto.id.toString()
-                ? "#fef3c7"
-                : "white"
-            }
+            bg={selectedValue === rotaPonto.ponto.id.toString() ? "#fef3c7" : "white"}
             _hover={{
-              bg:
-                selectedValue === rotaPonto.ponto.id.toString()
-                  ? "#fef3c7"
-                  : "#f1f5f9",
+              bg: selectedValue === rotaPonto.ponto.id.toString() ? "#fef3c7" : "#f1f5f9",
             }}
             cursor="pointer"
             onClick={() => onChange(rotaPonto.ponto.id.toString())}
@@ -250,9 +267,7 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
             borderColor="gray.100"
             borderLeft="2px solid"
             borderLeftColor={
-              selectedValue === rotaPonto.ponto.id.toString()
-                ? "#fdb525"
-                : "transparent"
+              selectedValue === rotaPonto.ponto.id.toString() ? "#fdb525" : "transparent"
             }
             align="center"
           >
@@ -263,15 +278,9 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
                 borderRadius="full"
                 border="2px solid"
                 borderColor={
-                  selectedValue === rotaPonto.ponto.id.toString()
-                    ? "#fdb525"
-                    : "#d1d5db"
+                  selectedValue === rotaPonto.ponto.id.toString() ? "#fdb525" : "#d1d5db"
                 }
-                bg={
-                  selectedValue === rotaPonto.ponto.id.toString()
-                    ? "#fdb525"
-                    : "white"
-                }
+                bg={selectedValue === rotaPonto.ponto.id.toString() ? "#fdb525" : "white"}
                 position="relative"
                 mx="auto"
               >
@@ -300,21 +309,13 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
               </Text>
             </Box>
             <Box w="80px" textAlign="center">
-              <Badge
-                bg="#e2e8f0"
-                color="#475569"
-                fontSize="xs"
-                px={2}
-                py={1}
-                borderRadius="full"
-              >
+              <Badge bg="#e2e8f0" color="#475569" fontSize="xs" px={2} py={1} borderRadius="full">
                 #{rotaPonto.ordem}
               </Badge>
             </Box>
           </Flex>
         ))}
 
-        {/* Opção "Não vou embarcar/desembarcar" */}
         <Flex
           w="full"
           p={3}
@@ -354,12 +355,7 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
             </Box>
           </Box>
           <Box flex="1" px={3}>
-            <Text
-              fontFamily="Montserrat"
-              fontWeight="500"
-              color="#64748b"
-              fontStyle="italic"
-            >
+            <Text fontFamily="Montserrat" fontWeight="500" color="#64748b" fontStyle="italic">
               {noOptionText}
             </Text>
           </Box>
@@ -368,30 +364,83 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
     </Box>
   );
 
+  const renderSeatMap = () => {
+    const seats = Array.from({ length: capacidadeAssentos }, (_, i) => i + 1);
+
+    if (isLoadingSeats) {
+      return (
+        <Box textAlign="center" py={8} bg="#f8fafc" borderRadius="md">
+          <Text fontFamily="Montserrat" color="#64748b">
+            Carregando mapa de assentos...
+          </Text>
+        </Box>
+      );
+    }
+
+    return (
+      <VStack spacing={4} align="stretch">
+        <HStack spacing={5} justify="center" wrap="wrap">
+          <HStack spacing={2}>
+            <Box w={3} h={3} borderRadius="full" bg="#22c55e" />
+            <Text fontFamily="Montserrat" fontSize="sm" color="#475569">
+              Livre
+            </Text>
+          </HStack>
+          <HStack spacing={2}>
+            <Box w={3} h={3} borderRadius="full" bg="#ef4444" />
+            <Text fontFamily="Montserrat" fontSize="sm" color="#475569">
+              Ocupado
+            </Text>
+          </HStack>
+          <HStack spacing={2}>
+            <Box w={3} h={3} borderRadius="full" bg="#fdb525" />
+            <Text fontFamily="Montserrat" fontSize="sm" color="#475569">
+              Selecionado
+            </Text>
+          </HStack>
+        </HStack>
+
+        <Flex wrap="wrap" gap={2} justify="center" maxH="330px" overflowY="auto">
+          {seats.map((seat) => {
+            const isOccupied = assentosOcupados.includes(seat);
+            const isSelected = selectedAssento === seat;
+            const bg = isSelected ? "#fdb525" : isOccupied ? "#ef4444" : "#22c55e";
+
+            return (
+              <Button
+                key={seat}
+                w="52px"
+                h="52px"
+                borderRadius="md"
+                bg={bg}
+                color="white"
+                fontFamily="Montserrat"
+                fontWeight="bold"
+                fontSize="sm"
+                isDisabled={isOccupied}
+                onClick={() => setSelectedAssento(seat)}
+                _hover={{
+                  opacity: isOccupied ? 1 : 0.9,
+                  transform: isOccupied ? "none" : "scale(1.03)",
+                }}
+              >
+                {seat}
+              </Button>
+            );
+          })}
+        </Flex>
+      </VStack>
+    );
+  };
+
   return (
-    <Dialog.Root
-      open={isOpen}
-      onOpenChange={onClose}
-      motionPreset="slide-in-bottom"
-      placement="center"
-    >
+    <Dialog.Root open={isOpen} onOpenChange={onClose} motionPreset="slide-in-bottom" placement="center">
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner>
-          <Dialog.Content
-            bg="white"
-            color="#1e293b"
-            borderRadius="lg"
-            maxW="900px"
-            w="90vw"
-          >
+          <Dialog.Content bg="white" color="#1e293b" borderRadius="lg" maxW="900px" w="90vw">
             <Dialog.Header borderBottom="1px solid #e2e8f0" pb={4}>
-              <Dialog.Title
-                fontFamily="Montserrat"
-                color="#1e293b"
-                fontSize="xl"
-                fontWeight="bold"
-              >
+              <Dialog.Title fontFamily="Montserrat" color="#1e293b" fontSize="xl" fontWeight="bold">
                 <Flex alignItems="center" gap={3}>
                   <FiMapPin color="#fdb525" />
                   <Box>
@@ -406,10 +455,9 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
 
             <Dialog.Body py={6}>
               <VStack spacing={6} align="stretch">
-                {/* Progress Steps */}
-                <HStack spacing={4} justify="center">
+                <HStack spacing={4} justify="center" wrap="wrap">
                   {steps.map((step, index) => (
-                    <Flex key={index} alignItems="center" gap={2}>
+                    <Flex key={step.title} alignItems="center" gap={2}>
                       <Box
                         w={8}
                         h={8}
@@ -423,11 +471,7 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
                         fontWeight="bold"
                         fontFamily="Montserrat"
                       >
-                        {index < currentStep ? (
-                          <FiCheckCircle size={16} />
-                        ) : (
-                          index + 1
-                        )}
+                        {index < currentStep ? <FiCheckCircle size={16} /> : index + 1}
                       </Box>
                       <Text
                         fontFamily="Montserrat"
@@ -437,35 +481,34 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
                       >
                         {step.title}
                       </Text>
-                      {index < steps.length - 1 && (
-                        <Box w={8} h="2px" bg="#e2e8f0" mx={2} />
-                      )}
+                      {index < steps.length - 1 && <Box w={8} h="2px" bg="#e2e8f0" mx={2} />}
                     </Flex>
                   ))}
                 </HStack>
 
-                {/* Content */}
-                {isLoading ? (
-                  <Box textAlign="center" py={8}>
-                    <Text fontFamily="Montserrat" color="#64748b">
-                      Carregando pontos...
-                    </Text>
-                  </Box>
-                ) : currentStepData.data.length === 0 ? (
-                  <Box textAlign="center" py={8} bg="#f8fafc" borderRadius="md">
-                    <Text fontFamily="Montserrat" color="#64748b">
-                      Nenhum ponto de{" "}
-                      {currentStep === 0 ? "embarque" : "desembarque"}{" "}
-                      disponível nesta rota
-                    </Text>
-                  </Box>
-                ) : (
-                  renderTable(
-                    currentStepData.data,
-                    currentStepData.selectedValue,
-                    currentStepData.onChange,
-                    currentStepData.noOptionText
+                {currentStep < 2 ? (
+                  isLoading ? (
+                    <Box textAlign="center" py={8}>
+                      <Text fontFamily="Montserrat" color="#64748b">
+                        Carregando pontos...
+                      </Text>
+                    </Box>
+                  ) : currentStepData.data.length === 0 ? (
+                    <Box textAlign="center" py={8} bg="#f8fafc" borderRadius="md">
+                      <Text fontFamily="Montserrat" color="#64748b">
+                        Nenhum ponto de {currentStep === 0 ? "embarque" : "desembarque"} disponível nesta rota
+                      </Text>
+                    </Box>
+                  ) : (
+                    renderTable(
+                      currentStepData.data,
+                      currentStepData.selectedValue,
+                      currentStepData.onChange,
+                      currentStepData.noOptionText
+                    )
                   )
+                ) : (
+                  renderSeatMap()
                 )}
               </VStack>
             </Dialog.Body>
@@ -478,7 +521,7 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
                   fontFamily="Montserrat"
                   fontWeight="bold"
                   onClick={handlePrevious}
-                  isDisabled={currentStep === 0}
+                  isDisabled={currentStep === 0 || isLoading || isLoadingSeats}
                   _hover={{
                     bg: "#f59e0b",
                     transform: "scale(1.02)",
@@ -517,7 +560,7 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
                       fontFamily="Montserrat"
                       fontWeight="bold"
                       onClick={handleConfirm}
-                      isDisabled={!selectedDesembarque || isLoading}
+                      isDisabled={!selectedAssento || isLoading || isLoadingSeats}
                       isLoading={isLoading}
                       _hover={{
                         bg: "#f59e0b",
@@ -525,7 +568,7 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
                         transition: "0.3s",
                       }}
                     >
-                      Confirmar Escolhas
+                      Confirmar Assento
                     </Button>
                   ) : (
                     <Button
@@ -534,7 +577,7 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
                       fontFamily="Montserrat"
                       fontWeight="bold"
                       onClick={handleNext}
-                      isDisabled={!selectedEmbarque}
+                      isDisabled={!canGoNext || isLoading || isLoadingSeats}
                       _hover={{
                         bg: "#f59e0b",
                         transform: "scale(1.02)",
@@ -549,11 +592,7 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
             </Dialog.Footer>
 
             <Dialog.CloseTrigger asChild>
-              <CloseButton
-                size="sm"
-                color="#64748b"
-                _hover={{ bg: "#f1f5f9" }}
-              />
+              <CloseButton size="sm" color="#64748b" _hover={{ bg: "#f1f5f9" }} />
             </Dialog.CloseTrigger>
           </Dialog.Content>
         </Dialog.Positioner>

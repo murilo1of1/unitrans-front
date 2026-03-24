@@ -1,5 +1,5 @@
 "use client";
-import { Box, Flex, Text, Button, Image, VStack, Card } from "@chakra-ui/react";
+import { Box, Flex, Text, Button, Image, VStack, Card, HStack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/utils/axios";
@@ -11,6 +11,7 @@ export default function User() {
   const [companies, setCompanies] = useState([]);
   const [solicitations, setSolicitations] = useState([]);
   const [rotas, setRotas] = useState([]);
+  const [reservasAssentoPorRota, setReservasAssentoPorRota] = useState({});
   const [aluno, setAluno] = useState(null);
   const [loading, setLoading] = useState(true);
   const [loadingSolicitations, setLoadingSolicitations] = useState(false);
@@ -93,6 +94,13 @@ export default function User() {
   const handleCloseRoutePointsDialog = () => {
     setSelectedRoute(null);
     setIsRoutePointsDialogOpen(false);
+
+    const token = localStorage.getItem("token");
+    const decodedToken = decodeToken(token);
+    if (decodedToken && (decodedToken.idAluno || decodedToken.id)) {
+      const studentId = decodedToken.idAluno || decodedToken.id;
+      fetchRotas(studentId, token);
+    }
   };
 
   const fetchCompanies = async (idAluno, token) => {
@@ -196,6 +204,21 @@ export default function User() {
         }
       }
 
+      try {
+        const reservasResponse = await api.get(
+          `/aluno/${idAluno}/reservas-assento`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        setReservasAssentoPorRota(reservasResponse.data?.data?.porRota || {});
+      } catch (error) {
+        setReservasAssentoPorRota({});
+      }
+
       setRotas(todasRotas);
     } catch (error) {
       console.error("Erro ao buscar rotas:", error);
@@ -297,21 +320,45 @@ export default function User() {
                         >
                           Destino: {rota.destino}
                         </Text>
+                        <Text
+                          fontFamily="Montserrat"
+                          fontSize="sm"
+                          color="gray.600"
+                        >
+                          Assentos: {rota.capacidadeAssentos || 40}
+                        </Text>
                       </Box>
-                      <Button
-                        size="sm"
-                        bg="#fdb525"
-                        color="white"
-                        fontFamily="Montserrat"
-                        fontWeight="bold"
-                        _hover={{
-                          bg: "#f59e0b",
-                          transform: "scale(1.02)",
-                        }}
-                        onClick={() => handleViewRoutePoints(rota)}
-                      >
-                        Ver Pontos
-                      </Button>
+                      <HStack spacing={2}>
+                        {reservasAssentoPorRota[rota.id] && (
+                          <Button
+                            size="sm"
+                            bg="#22c55e"
+                            color="white"
+                            fontFamily="Montserrat"
+                            fontWeight="bold"
+                            _hover={{
+                              bg: "#16a34a",
+                            }}
+                          >
+                            Assento reservado
+                          </Button>
+                        )}
+
+                        <Button
+                          size="sm"
+                          bg="#fdb525"
+                          color="white"
+                          fontFamily="Montserrat"
+                          fontWeight="bold"
+                          _hover={{
+                            bg: "#f59e0b",
+                            transform: "scale(1.02)",
+                          }}
+                          onClick={() => handleViewRoutePoints(rota)}
+                        >
+                          Ver Pontos
+                        </Button>
+                      </HStack>
                     </Flex>
                   </Card.Root>
                 ))}

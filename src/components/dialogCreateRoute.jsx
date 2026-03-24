@@ -21,6 +21,7 @@ export default function DialogCreateRoute({
   const [nome, setNome] = useState("");
   const [origem, setOrigem] = useState("");
   const [destino, setDestino] = useState("");
+  const [capacidadeAssentos, setCapacidadeAssentos] = useState("40");
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -28,10 +29,12 @@ export default function DialogCreateRoute({
       setNome(editingRoute.nome || "");
       setOrigem(editingRoute.origem || "");
       setDestino(editingRoute.destino || "");
+      setCapacidadeAssentos(String(editingRoute.capacidadeAssentos || 40));
     } else if (isOpen && !editingRoute) {
       setNome("");
       setOrigem("");
       setDestino("");
+      setCapacidadeAssentos("40");
     }
     setIsLoading(false);
   }, [isOpen, editingRoute]);
@@ -56,6 +59,16 @@ export default function DialogCreateRoute({
     if (!destino.trim()) {
       toaster.create({
         title: "Destino é obrigatório",
+        status: "error",
+      });
+      return;
+    }
+
+    const capacidade = Number(capacidadeAssentos);
+    if (!Number.isInteger(capacidade) || capacidade < 1) {
+      toaster.create({
+        title: "Capacidade de assentos inválida",
+        description: "Informe um número inteiro maior que 0.",
         status: "error",
       });
       return;
@@ -100,6 +113,7 @@ export default function DialogCreateRoute({
         nome: nome.trim(),
         origem: origem.trim(),
         destino: destino.trim(),
+        capacidadeAssentos: capacidade,
         idEmpresa: decodedToken.idEmpresa,
       };
 
@@ -162,6 +176,31 @@ export default function DialogCreateRoute({
             </Dialog.Header>
             <Dialog.Body>
               <VStack spacing={4} align="stretch">
+                <Box>
+                  <FormLabel
+                    fontFamily="Montserrat"
+                    color="#fdb525"
+                    fontWeight="500"
+                    mb={2}
+                    htmlFor="capacidade-assentos"
+                  >
+                    Capacidade de Assentos *
+                  </FormLabel>
+                  <Input
+                    fontFamily="Montserrat"
+                    id="capacidade-assentos"
+                    type="number"
+                    min={1}
+                    placeholder="Ex: 40"
+                    value={capacidadeAssentos}
+                    onChange={(e) => setCapacidadeAssentos(e.target.value)}
+                    bg="#3a3947"
+                    border="1px solid #4a4a5c"
+                    color="#fff"
+                    _placeholder={{ color: "#a0a0a0" }}
+                  />
+                </Box>
+
                 <Box>
                   <FormLabel
                     fontFamily="Montserrat"
