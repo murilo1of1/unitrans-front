@@ -20,6 +20,7 @@ import InputPesquisa from "@/components/inputPesquisa";
 import DialogGenerateToken from "@/components/dialogGenerateToken";
 import DialogConfirmation from "@/components/dialogConfirmation";
 import DialogCreatePoint from "@/components/dialogCreatePoint";
+import DialogCreateFatura from "@/components/dialogCreateFatura";
 import DialogCreateRoute from "@/components/dialogCreateRoute";
 import DialogManageRoutePoints from "@/components/dialogManageRoutePoints";
 import DialogPassengerList from "@/components/dialogPassengerList";
@@ -47,6 +48,8 @@ export default function Admin() {
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [isCreatePointDialogOpen, setIsCreatePointDialogOpen] = useState(false);
   const [isCreateRouteDialogOpen, setIsCreateRouteDialogOpen] = useState(false);
+  const [isCreateFaturaDialogOpen, setIsCreateFaturaDialogOpen] = useState(false);
+  const [selectedStudentForFatura, setSelectedStudentForFatura] = useState(null);
   const [editingRoute, setEditingRoute] = useState(null);
   const [editingPoint, setEditingPoint] = useState(null);
   const [isManageRoutePointsOpen, setIsManageRoutePointsOpen] = useState(false);
@@ -107,6 +110,11 @@ export default function Admin() {
       fetchStudents(decodedToken.idEmpresa, token);
       fetchSolicitations(decodedToken.idEmpresa, token);
     }
+  };
+
+  const handleCobrarStudent = (student) => {
+    setSelectedStudentForFatura(student);
+    setIsCreateFaturaDialogOpen(true);
   };
 
   const handleRemoveStudent = (studentId, reactivate = false) => {
@@ -396,6 +404,8 @@ export default function Admin() {
     setIsCreateRouteDialogOpen(false);
     setIsCreatePointDialogOpen(false);
     setIsManageRoutePointsOpen(false);
+    setIsCreateFaturaDialogOpen(false);
+    setSelectedStudentForFatura(null);
   };
 
   const filteredStudents = students.filter(
@@ -532,6 +542,7 @@ export default function Admin() {
                 students={filteredStudents}
                 loading={loadingStudents}
                 onRemoveStudent={handleRemoveStudent}
+                onCobrarStudent={handleCobrarStudent}
               />
             ) : (
               <TableSolicitations
@@ -1090,6 +1101,12 @@ export default function Admin() {
         editingPoint={editingPoint}
       />
 
+      <DialogCreateFatura
+        isOpen={isCreateFaturaDialogOpen}
+        onClose={closeDialogs}
+        student={selectedStudentForFatura}
+        empresaId={empresa?.idEmpresa}
+      />
       <DialogCreateRoute
         isOpen={isCreateRouteDialogOpen}
         onClose={closeDialogs}

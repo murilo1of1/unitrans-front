@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import api from "@/utils/axios";
 import DialogAddCompany from "@/components/dialogAddCompany";
 import TableSolicitationsUser from "@/components/tableSolicitationsUser";
+import StudentFaturas from "@/components/studentFaturas";
 import DialogRoutePointsUser from "@/components/dialogRoutePointsUser";
 
 export default function User() {
@@ -416,10 +417,18 @@ export default function User() {
         );
       case "pagamentos":
         return (
-          <Box textAlign="center" mt={8}>
-            <Text fontFamily="Montserrat" fontSize="lg" color="gray.600">
-              Seção de Pagamentos - Em desenvolvimento
-            </Text>
+          <Box>
+            <Flex justifyContent="space-between" alignItems="center" mb={6}>
+              <Text
+                fontSize="2xl"
+                fontWeight="bold"
+                fontFamily="Montserrat"
+                color="#334155"
+              >
+                Minhas Faturas
+              </Text>
+            </Flex>
+            <StudentFaturas />
           </Box>
         );
       case "solicitacoes":
