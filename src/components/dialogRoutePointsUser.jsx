@@ -366,6 +366,11 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
 
   const renderSeatMap = () => {
     const seats = Array.from({ length: capacidadeAssentos }, (_, i) => i + 1);
+    const rows = [];
+
+    for (let i = 0; i < seats.length; i += 4) {
+      rows.push(seats.slice(i, i + 4));
+    }
 
     if (isLoadingSeats) {
       return (
@@ -400,35 +405,91 @@ export default function DialogRoutePointsUser({ isOpen, onClose, route }) {
           </HStack>
         </HStack>
 
-        <Flex wrap="wrap" gap={2} justify="center" maxH="330px" overflowY="auto">
-          {seats.map((seat) => {
-            const isOccupied = assentosOcupados.includes(seat);
-            const isSelected = selectedAssento === seat;
-            const bg = isSelected ? "#fdb525" : isOccupied ? "#ef4444" : "#22c55e";
-
-            return (
-              <Button
-                key={seat}
-                w="52px"
-                h="52px"
-                borderRadius="md"
-                bg={bg}
-                color="white"
+        <VStack spacing={2} maxH="420px" overflowY="auto" align="center">
+          {rows.map((rowSeats, rowIndex) => (
+            <HStack key={rowIndex} spacing={4} align="center">
+              <Text
+                w="24px"
+                textAlign="center"
                 fontFamily="Montserrat"
-                fontWeight="bold"
-                fontSize="sm"
-                isDisabled={isOccupied}
-                onClick={() => setSelectedAssento(seat)}
-                _hover={{
-                  opacity: isOccupied ? 1 : 0.9,
-                  transform: isOccupied ? "none" : "scale(1.03)",
-                }}
+                fontSize="xs"
+                color="#64748b"
               >
-                {seat}
-              </Button>
-            );
-          })}
-        </Flex>
+                {rowIndex + 1}
+              </Text>
+
+              <HStack spacing={2}>
+                {rowSeats.slice(0, 2).map((seat) => {
+                  const isOccupied = assentosOcupados.includes(seat);
+                  const isSelected = selectedAssento === seat;
+                  const bg = isSelected
+                    ? "#fdb525"
+                    : isOccupied
+                    ? "#ef4444"
+                    : "#22c55e";
+
+                  return (
+                    <Button
+                      key={seat}
+                      w="48px"
+                      h="48px"
+                      borderRadius="md"
+                      bg={bg}
+                      color="white"
+                      fontFamily="Montserrat"
+                      fontWeight="bold"
+                      fontSize="sm"
+                      isDisabled={isOccupied}
+                      onClick={() => setSelectedAssento(seat)}
+                      _hover={{
+                        opacity: isOccupied ? 1 : 0.9,
+                        transform: isOccupied ? "none" : "scale(1.03)",
+                      }}
+                    >
+                      {seat}
+                    </Button>
+                  );
+                })}
+              </HStack>
+
+              <Box w="26px" h="2px" bg="#cbd5e1" borderRadius="full" />
+
+              <HStack spacing={2}>
+                {rowSeats.slice(2, 4).map((seat) => {
+                  const isOccupied = assentosOcupados.includes(seat);
+                  const isSelected = selectedAssento === seat;
+                  const bg = isSelected
+                    ? "#fdb525"
+                    : isOccupied
+                    ? "#ef4444"
+                    : "#22c55e";
+
+                  return (
+                    <Button
+                      key={seat}
+                      w="48px"
+                      h="48px"
+                      borderRadius="md"
+                      bg={bg}
+                      color="white"
+                      fontFamily="Montserrat"
+                      fontWeight="bold"
+                      fontSize="sm"
+                      isDisabled={isOccupied}
+                      onClick={() => setSelectedAssento(seat)}
+                      _hover={{
+                        opacity: isOccupied ? 1 : 0.9,
+                        transform: isOccupied ? "none" : "scale(1.03)",
+                      }}
+                    >
+                      {seat}
+                    </Button>
+                  );
+                })}
+              </HStack>
+            </HStack>
+          ))}
+        </VStack>
       </VStack>
     );
   };

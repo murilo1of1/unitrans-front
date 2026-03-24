@@ -1,5 +1,5 @@
 "use client";
-import { Box, Flex, Text, Button, Image, VStack, Card, HStack } from "@chakra-ui/react";
+import { Box, Flex, Text, Button, Image, VStack, Card, HStack, Badge } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/utils/axios";
@@ -330,18 +330,19 @@ export default function User() {
                       </Box>
                       <HStack spacing={2}>
                         {reservasAssentoPorRota[rota.id] && (
-                          <Button
-                            size="sm"
+                          <Badge
                             bg="#22c55e"
                             color="white"
                             fontFamily="Montserrat"
                             fontWeight="bold"
-                            _hover={{
-                              bg: "#16a34a",
-                            }}
+                            px={3}
+                            py={2}
+                            borderRadius="md"
+                            textTransform="none"
+                            fontSize="xs"
                           >
                             Assento reservado
-                          </Button>
+                          </Badge>
                         )}
 
                         <Button
